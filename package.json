@@ -16,6 +16,6 @@
     "@vitejs/plugin-vue": "^6.0.1",
     "vite": "^7.1.2"
   },
-  "engines": { "node": ">=18 <21" }
+  "engines": { "node": ">=20.19.0 <21" }
 
 }
