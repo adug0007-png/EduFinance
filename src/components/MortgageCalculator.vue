@@ -51,6 +51,33 @@
       </div>
     </div>
 
+    <!-- Result Modal -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Calculation Results</h3>
+          <button class="close-button" @click="closeModal">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="result-item">
+            <span class="result-label">Monthly Payment:</span>
+            <span class="result-value">${{ formatNumber(monthlyPayment) }}</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Payment:</span>
+            <span class="result-value">${{ formatNumber(totalPayment) }}</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Interest:</span>
+            <span class="result-value">${{ formatNumber(totalInterest) }}</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-button" @click="closeModal">OK</button>
+        </div>
+      </div>
+    </div>
+
     <footer class="page-footer">
       <div class="footer-content">
         © 2025 Mortgage Calculator
@@ -67,7 +94,10 @@ export default {
       loanAmount: '500,000',
       interestRate: '3.75',
       loanTerm: '30',
-      monthlyPayment: null
+      monthlyPayment: null,
+      totalPayment: null,
+      totalInterest: null,
+      showModal: false
     }
   },
   methods: {
@@ -79,8 +109,20 @@ export default {
       if (principal && rate && payments) {
         const monthlyPayment = principal * (rate * Math.pow(1 + rate, payments)) / (Math.pow(1 + rate, payments) - 1)
         this.monthlyPayment = monthlyPayment.toFixed(2)
-        console.log('Monthly Payment:', this.monthlyPayment)
+        this.totalPayment = (monthlyPayment * payments).toFixed(2)
+        this.totalInterest = (this.totalPayment - principal).toFixed(2)
+        this.showModal = true
       }
+    },
+    closeModal() {
+      this.showModal = false
+    },
+    formatNumber(value) {
+      if (!value) return '0'
+      return parseFloat(value).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
     }
   }
 }
@@ -229,5 +271,107 @@ export default {
   text-align: center;
   color: #9ca3af;
   font-size: 14px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 24px 24px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #374151;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-label {
+  font-size: 16px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.result-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #059669;
+}
+
+.modal-footer {
+  padding: 0 24px 24px 24px;
+}
+
+.modal-button {
+  width: 100%;
+  height: 44px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-button:hover {
+  background: #4338ca;
 }
 </style>
