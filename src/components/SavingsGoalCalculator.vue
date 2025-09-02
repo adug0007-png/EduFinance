@@ -1,11 +1,5 @@
 <template>
   <div class="savings-goal-calculator">
-    <!-- Header -->
-    <div class="header">
-      <h1>Savings Goal Calculator</h1>
-      <p>Set your financial goals and discover how much you need to save</p>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
       <!-- Left Side - Form -->
@@ -88,28 +82,6 @@
           <h4>Progress Visualization</h4>
           <div class="chart-container">
             <canvas ref="chartCanvas" width="400" height="200"></canvas>
-          </div>
-        </div>
-
-        <div class="goal-breakdown">
-          <h4>Goal Breakdown</h4>
-          <div class="breakdown-table">
-            <div class="breakdown-row">
-              <span class="label">Target Amount</span>
-              <span class="value">${{ formatNumber(savingsGoalNum) }}</span>
-            </div>
-            <div class="breakdown-row">
-              <span class="label">Initial Deposit</span>
-              <span class="value">${{ formatNumber(initialDepositNum) }}</span>
-            </div>
-            <div class="breakdown-row">
-              <span class="label">Amount to Save</span>
-              <span class="value">${{ formatNumber(amountToSave) }}</span>
-            </div>
-            <div class="breakdown-row">
-              <span class="label">Timeline</span>
-              <span class="value">{{ timeline }} {{ timeUnit }}</span>
-            </div>
           </div>
         </div>
       </div>

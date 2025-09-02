@@ -1,3 +1,4 @@
+        <!-- 3 Cards -->
 <template>
   <section class="features">
     <div class="container">
@@ -7,7 +8,7 @@
       </div>
       <div class="features-grid">
         <!-- Card 1 -->
-        <article class="feature-card">
+        <article class="feature-card" @click="navigateTo('cost-estimator')" style="cursor:pointer;">
           <div class="card-icon-badge icon-blue">
             <img src="../assets/icon-calculator.svg" alt="Calculator icon" />
           </div>
@@ -19,7 +20,7 @@
         </article>
 
         <!-- Card 2 -->
-        <article class="feature-card">
+        <article class="feature-card" @click="navigateTo('financial-literacy')" style="cursor:pointer;">
           <div class="card-icon-badge icon-green">
             <img src="../assets/icon-book.svg" alt="Learning icon" />
           </div>
@@ -47,6 +48,10 @@
 </template>
 
 <script setup>
+import { inject } from 'vue'
+
+// 从 App.vue 拿到 navigateTo
+const navigateTo = inject('navigateTo')
 </script>
 
 <style scoped>
@@ -73,6 +78,10 @@
   transition: transform .2s ease, box-shadow .2s ease;
 }
 .feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md, 0 12px 24px rgba(0,0,0,.08)); }
+
+.feature-card {
+  cursor: pointer;
+}
 
 .card-icon-badge { width: 52px; height: 52px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; }
 .card-icon-badge img { width: 32px; height: 32px; display: block; }

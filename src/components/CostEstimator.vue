@@ -1,13 +1,5 @@
 <template>
   <div class="education-cost-estimator">
-    <!-- Header Section -->
-    <div class="header-section">
-      <div class="header-content">
-        <h1 class="page-title">Education Cost Estimator</h1>
-        <p class="page-subtitle">Plan your educational investment with precision</p>
-      </div>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
       <div class="estimator-container">

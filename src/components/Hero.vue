@@ -1,4 +1,6 @@
+
 <template>
+
   <section class="hero">
     <div class="container">
       <div class="hero-grid">
@@ -7,8 +9,7 @@
           <h1 class="hero-title">Plan Your Education Journey & Learn...</h1>
           <p class="hero-subtitle">Master financial literacy while planning your educational future. Get personalized cost estimates and learn essential money management skills for life.</p>
           <div class="hero-buttons">
-            <button class="btn btn-primary">Get Started</button>
-            <button class="btn btn-secondary">Learn Basics</button>
+            <button class="btn btn-primary" @click="navigateTo('savings-goal-calculator')" >Get Started</button>
           </div>
         </div>
         <!-- 右侧图片：不在卡片内 -->
@@ -21,6 +22,8 @@
 </template>
 
 <script setup>
+import { inject } from 'vue'
+const navigateTo = inject('navigateTo')
 </script>
 
 <style scoped>

@@ -1,3 +1,4 @@
+
 <template>
   <section class="mortgage-calculator">
     <div class="main-content">
@@ -77,12 +78,6 @@
         </div>
       </div>
     </div>
-
-    <footer class="page-footer">
-      <div class="footer-content">
-        © 2025 Mortgage Calculator
-      </div>
-    </footer>
   </section>
 </template>
 

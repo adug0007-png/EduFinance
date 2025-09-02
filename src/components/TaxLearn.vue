@@ -1,28 +1,5 @@
 <template>
   <div class="tax-learn">
-    <!-- Header Section -->
-    <div class="header-section">
-      <div class="header-content">
-        <div class="logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" fill="#4f46e5"/>
-            <path d="M8 14s1.5 2 4 2 4-2 4-2" stroke="white" stroke-width="2"/>
-          </svg>
-          <span class="logo-text">TaxLearn</span>
-        </div>
-        <!-- Navigation links removed as requested -->
-      </div>
-    </div>
-
-    <!-- Main Title -->
-    <div class="title-section">
-      <h1 class="main-title">Learn Tax & Super</h1>
-      <p class="main-subtitle">
-        Interactive flashcards and calculators to master Australian taxation and<br>
-        superannuation. Study, calculate, and understand your finances better.
-      </p>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
       <!-- Left Column - Salary Calculator -->
@@ -30,7 +7,7 @@
         <div class="calculator-card">
           <div class="card-header">
             <h2 class="card-title">Salary Calculator</h2>
-            <button class="refresh-btn">🔄</button>
+            <button class="refresh-btn"></button>
           </div>
           <p class="card-subtitle">Flip the card to see your take-home pay</p>
 
@@ -59,7 +36,7 @@
             </div>
           </div>
 
-          <button class="calculate-btn" @click="calculateTax">📊 Calculate Take-Home Pay</button>
+          <button class="calculate-btn" @click="calculateTax">Calculate Take-Home Pay</button>
 
           <div class="breakdown-section">
             <h3 class="breakdown-title">Your Breakdown</h3>
@@ -214,28 +191,6 @@
             </div>
             <button class="advice-btn">Get Advice</button>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Additional Resources -->
-    <div class="resources-section">
-      <h2 class="resources-title">Additional Resources</h2>
-      <div class="resources-grid">
-        <div class="resource-item">
-          <div class="resource-icon blue">📅</div>
-          <h3 class="resource-title">Tax Guide</h3>
-          <p class="resource-desc">Comprehensive guide to Australian taxation</p>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon green">⚙️</div>
-          <h3 class="resource-title">More Calculators</h3>
-          <p class="resource-desc">Explore our full suite of financial tools</p>
-        </div>
-        <div class="resource-item">
-          <div class="resource-icon purple">📞</div>
-          <h3 class="resource-title">Expert Advice</h3>
-          <p class="resource-desc">Speak with our qualified financial advisers</p>
         </div>
       </div>
     </div>

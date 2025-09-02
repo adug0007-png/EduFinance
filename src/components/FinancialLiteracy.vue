@@ -1,43 +1,5 @@
 <template>
   <div class="financial-literacy">
-    <!-- Header Section -->
-    <div class="header-section">
-      <div class="header-content">
-        <div class="header-left">
-          <h1 class="page-title">Financial Literacy Modules</h1>
-          <div class="breadcrumb">
-            <span class="breadcrumb-item">Learning Hub</span>
-            <span class="breadcrumb-separator">›</span>
-            <span class="breadcrumb-item active">Financial Literacy</span>
-          </div>
-        </div>
-        
-        <div class="header-controls">
-          <div class="search-box">
-            <input type="text" placeholder="Search modules..." class="search-input">
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M21 21L16.514 16.506M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <button class="filter-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M3 6h18M7 12h10M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            Filter
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Description Section -->
-    <div class="description-section">
-      <div class="description-content">
-        <p class="page-description">
-          Master essential financial skills through our comprehensive learning modules. Each lesson is designed to build your confidence and knowledge in managing personal finances.
-        </p>
-      </div>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
       <!-- Learning Modules Grid -->
@@ -71,29 +33,6 @@
               <span class="difficulty" :class="module.difficulty.toLowerCase()">{{ module.difficulty }}</span>
             </div>
             <button class="start-learning-btn" @click="startLearning(module)">Start Learning</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Learning Progress Section -->
-      <div class="progress-section">
-        <div class="progress-header">
-          <h2 class="progress-title">Your Learning Progress</h2>
-          <button class="view-all-btn">📚 View All Courses</button>
-        </div>
-        
-        <div class="progress-stats">
-          <div class="stat-item">
-            <div class="stat-number blue">2</div>
-            <div class="stat-label">Modules Completed</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number purple">3</div>
-            <div class="stat-label">In Progress</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number pink">15</div>
-            <div class="stat-label">Total Hours</div>
           </div>
         </div>
       </div>

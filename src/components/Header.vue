@@ -7,7 +7,7 @@
             <path fill="var(--primary-color)" d="M12 3l9 4-9 4-9-4 9-4Z"/>
             <path fill="#A5B4FC" d="M6 10v4c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-4l-6 3-6-3Z"/>
           </svg>
-          <span class="logo-text">EduFinance</span>
+          <span class="logo-text">WealthWave</span>
         </div>
         <ul class="nav-links">
           <li><a href="#mortgage-calculator" :class="{ active: currentRoute === 'mortgage-calculator' }">Calculator</a></li>

@@ -1,14 +1,4 @@
 <template>
-  <section class="cta">
-    <div class="container cta-container">
-      <h2 class="section-title">Start Your Financial Education Journey Today</h2>
-      <p class="section-subtitle">Join thousands of students who are taking control of their financial future. Begin with our free tools and resources.</p>
-      <div class="cta-buttons">
-        <button class="btn btn-primary" @click="navigateTo('mortgage-calculator')">Get Started Free</button>
-        <button class="btn btn-secondary" @click="navigateTo('mortgage-calculator')">View Demo</button>
-      </div>
-    </div>
-  </section>
 </template>
 
 <script setup>

@@ -1,29 +1,9 @@
 <template>
+  
   <div class="budget-planner">
-    <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <div class="logo">
-          <div class="logo-icon">💰</div>
-          <span class="logo-text">Budget & Savings Tools</span>
-        </div>
-        <div class="nav-links">
-          <!-- 导航链接已移除 -->
-        </div>
-
-
-      </div>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
       <div class="container">
-        <!-- Title Section -->
-        <div class="title-section">
-          <h1>Personal Budget Planner</h1>
-          <p>Track your income and expenses with our intuitive planner to maintain perfect financial balance</p>
-        </div>
-
         <!-- Budget Form and Summary -->
         <div class="budget-section">
           <!-- Left Side - Form -->
@@ -235,52 +215,11 @@
                   <h4>Progress Visualization</h4>
                   <div ref="savingsChartRef" class="savings-chart"></div>
                 </div>
-                
-                <div class="goal-breakdown">
-                  <h4>Goal Breakdown</h4>
-                  <div class="breakdown-table">
-                    <div class="breakdown-row">
-                      <span class="breakdown-label">Target Amount</span>
-                      <span class="breakdown-value">${{ formatNumber(savingsGoal) }}</span>
-                    </div>
-                    <div class="breakdown-row">
-                      <span class="breakdown-label">Initial Deposit</span>
-                      <span class="breakdown-value">${{ formatNumber(initialDeposit) }}</span>
-                    </div>
-                    <div class="breakdown-row">
-                      <span class="breakdown-label">Amount to Save</span>
-                      <span class="breakdown-value">${{ formatNumber(amountToSave) }}</span>
-                    </div>
-                    <div class="breakdown-row">
-                      <span class="breakdown-label">Timeline</span>
-                      <span class="breakdown-value">{{ duration }} {{ timeUnit }}</span>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
 
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <div class="footer-content">
-        <div class="footer-left">
-          <div class="footer-logo">
-            <span class="footer-icon">📊</span>
-            <span class="footer-text">© 2025 Budget & Savings Tools. All rights reserved.</span>
-          </div>
-        </div>
-        <div class="footer-right">
-          <div class="payment-icons">
-            <div class="payment-icon visa">VISA</div>
-            <div class="payment-icon mastercard">MC</div>
-            <div class="payment-icon paypal">P</div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

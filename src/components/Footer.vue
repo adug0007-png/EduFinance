@@ -1,23 +1,4 @@
 <template>
-  <footer class="footer">
-    <div class="container footer-container">
-      <div class="footer-brand">
-        <svg class="logo-mark" viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="var(--primary-color)" d="M12 3l9 4-9 4-9-4 9-4Z"/>
-          <path fill="#A5B4FC" d="M6 10v4c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2v-4l-6 3-6-3Z"/>
-        </svg>
-        <span class="logo-text">EduFinance</span>
-      </div>
-      <div class="footer-copyright">
-        <p>&copy; 2025 EduFinance. All rights reserved.</p>
-      </div>
-      <nav class="footer-links">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a href="#privacy">Privacy</a>
-      </nav>
-    </div>
-  </footer>
 </template>
 
 <script setup>
