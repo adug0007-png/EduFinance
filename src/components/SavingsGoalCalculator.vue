@@ -129,8 +129,8 @@ export default {
       timeUnit: 'months',
       initialDeposit: '1,000',
       interestRate: '3.5',
-      monthlyAmount: '750',
-      weeklyAmount: '173',
+      monthlyAmount: '0',
+      weeklyAmount: '0',
       chart: null
     }
   },
@@ -149,7 +149,7 @@ export default {
     }
   },
   mounted() {
-    this.calculateSavings()
+    // Remove auto-calculation on mount
   },
   methods: {
     calculateSavings() {

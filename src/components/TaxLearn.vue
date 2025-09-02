@@ -10,12 +10,7 @@
           </svg>
           <span class="logo-text">TaxLearn</span>
         </div>
-        <nav class="top-nav">
-          <a href="#" class="nav-link">Home</a>
-          <a href="#" class="nav-link">Tools</a>
-          <a href="#" class="nav-link">Resources</a>
-          <a href="#" class="nav-link">Contact</a>
-        </nav>
+        <!-- Navigation links removed as requested -->
       </div>
     </div>
 
@@ -64,13 +59,13 @@
             </div>
           </div>
 
-          <button class="calculate-btn">📊 Calculate Take-Home Pay</button>
+          <button class="calculate-btn" @click="calculateTax">📊 Calculate Take-Home Pay</button>
 
           <div class="breakdown-section">
             <h3 class="breakdown-title">Your Breakdown</h3>
             <div class="salary-display">
               <div class="salary-label">Gross Salary</div>
-              <div class="salary-amount">$75,000</div>
+              <div class="salary-amount">${{ formatNumber(parseFloat(grossSalary.replace(/,/g, '')) || 0) }}</div>
               <div class="progress-bar">
                 <div class="progress-fill"></div>
               </div>
@@ -81,7 +76,7 @@
                 <div class="tax-color red"></div>
                 <div class="tax-info">
                   <div class="tax-name">Income Tax</div>
-                  <div class="tax-amount">$14,842</div>
+                  <div class="tax-amount">${{ formatNumber(calculatedResults.incomeTax) }}</div>
                   <div class="tax-period">per year</div>
                 </div>
               </div>
@@ -89,7 +84,7 @@
                 <div class="tax-color orange"></div>
                 <div class="tax-info">
                   <div class="tax-name">Medicare Levy</div>
-                  <div class="tax-amount">$1,500</div>
+                  <div class="tax-amount">${{ formatNumber(calculatedResults.medicareLevy) }}</div>
                   <div class="tax-period">per year</div>
                 </div>
               </div>
@@ -97,15 +92,15 @@
                 <div class="tax-color green"></div>
                 <div class="tax-info">
                   <div class="tax-name">Net Pay</div>
-                  <div class="tax-amount">$58,658</div>
+                  <div class="tax-amount">${{ formatNumber(calculatedResults.netPay) }}</div>
                   <div class="tax-period">per year</div>
                 </div>
               </div>
               <div class="tax-item super">
                 <div class="tax-color blue"></div>
                 <div class="tax-info">
-                  <div class="tax-name">Superannuation (11%)</div>
-                  <div class="tax-amount">$8,250</div>
+                  <div class="tax-name">Superannuation (11.5%)</div>
+                  <div class="tax-amount">${{ formatNumber(calculatedResults.superannuation) }}</div>
                   <div class="tax-period">per year</div>
                   <div class="tax-note">Employer contribution</div>
                 </div>
@@ -119,46 +114,39 @@
       <div class="right-column">
         <div class="flashcard-section">
           <div class="section-header">
-            <h2 class="section-title">Super Flashcards</h2>
+            <h2 class="section-title">Financial Terms Flashcards</h2>
             <div class="nav-arrows">
-              <button class="arrow-btn">◀</button>
-              <button class="arrow-btn">▶</button>
+              <button class="arrow-btn" @click="prevCard">◀</button>
+              <button class="arrow-btn" @click="nextCard">▶</button>
             </div>
           </div>
-          <p class="section-subtitle">Click cards to reveal explanations</p>
+          <p class="section-subtitle">Learn financial terms and definitions</p>
 
-          <!-- Study Super Concepts -->
+          <!-- Dynamic Term Card -->
           <div class="concept-card">
             <div class="concept-header">
-              <h3 class="concept-title">Study Super Concepts</h3>
-              <span class="concept-count">1/4 Done</span>
+              <h3 class="concept-title">{{ getCurrentTerm().term }}</h3>
+              <span class="concept-count">{{ currentCardIndex + 1 }}/{{ taxTerms.length }}</span>
             </div>
             
             <div class="concept-content">
               <p class="concept-text">
-                The Superannuation Guarantee (SG) is the mandatory contribution 
-                your employer must make to your super fund. Currently set at 11% 
-                of your ordinary time earnings.
+                {{ getCurrentTerm().definition }}
               </p>
-              <a href="#" class="concept-link">Tap to flip back</a>
+              <div class="category-badge" :class="getCategoryColor(getCurrentTerm().category)">
+                {{ getCurrentTerm().category }}
+              </div>
             </div>
 
-            <div class="concept-items">
-              <div class="concept-item">
-                <div class="item-icon green">●</div>
-                <div class="item-content">
-                  <div class="item-title">Salary Sacrifice</div>
-                  <div class="item-subtitle">Additional voluntary contributions</div>
-                </div>
-                <div class="item-status">Optional</div>
+            <!-- Navigation hints -->
+            <div class="navigation-hints">
+              <div class="hint-item">
+                <span class="hint-icon">◀</span>
+                <span class="hint-text">Previous term</span>
               </div>
-              <div class="concept-item">
-                <div class="item-icon purple">●</div>
-                <div class="item-content">
-                  <div class="item-title">Government Co-contribution</div>
-                  <div class="item-subtitle">Up to $500 for eligible earners</div>
-                </div>
-                <div class="item-amount">$500</div>
+              <div class="hint-item">
+                <span class="hint-icon">▶</span>
+                <span class="hint-text">Next term</span>
               </div>
             </div>
           </div>
@@ -261,7 +249,247 @@ export default {
     return {
       grossSalary: '75,000',
       payFrequency: 'Annual',
-      state: 'NSW'
+      state: 'NSW',
+      calculatedResults: {
+        incomeTax: 0,
+        medicareLevy: 0,
+        netPay: 0,
+        superannuation: 0
+      },
+      currentCardIndex: 0,
+      taxTerms: [
+        {
+          term: "Non-concessional contribution",
+          definition: "After-tax contribution to super.",
+          category: "Superannuation"
+        },
+        {
+          term: "Preservation age",
+          definition: "Earliest age you can access super.",
+          category: "Superannuation"
+        },
+        {
+          term: "BSB",
+          definition: "Bank routing number used with account number.",
+          category: "Banking & payments"
+        },
+        {
+          term: "Account number",
+          definition: "Your unique banking account identifier.",
+          category: "Banking & payments"
+        },
+        {
+          term: "PayID/Osko",
+          definition: "Fast payments using email/phone as an identifier.",
+          category: "Banking & payments"
+        },
+        {
+          term: "Debit card",
+          definition: "Spends money from your bank account.",
+          category: "Banking & payments"
+        },
+        {
+          term: "Credit card",
+          definition: "Borrows money up to a limit.",
+          category: "Interest not repaid"
+        },
+        {
+          term: "Direct debit",
+          definition: "Merchant automatically debits money from your account.",
+          category: "Banking & payments"
+        },
+        {
+          term: "BPAY",
+          definition: "Bill payment method via your online banking.",
+          category: "Banking & payments"
+        },
+        {
+          term: "Overdraft",
+          definition: "Bank allows negative balance.",
+          category: "fees/interest apply"
+        },
+        {
+          term: "Chargeback",
+          definition: "Ask bank to reverse a card charge for issues/scams.",
+          category: "Banking & payments"
+        },
+        {
+          term: "Budget",
+          definition: "Plan of income vs spending and saving.",
+          category: "Budgeting"
+        },
+        {
+          term: "Needs vs Wants",
+          definition: "Essentials (needs) vs optional (wants) spending.",
+          category: "Budgeting"
+        },
+        {
+          term: "50/30/20 rule",
+          definition: "Guide: 50% needs, 30% wants, 20% saving/debt.",
+          category: "Budgeting"
+        },
+        {
+          term: "Fixed cost",
+          definition: "Expenses that stays the same (e.g. rent).",
+          category: "Budgeting"
+        },
+        {
+          term: "Variable cost",
+          definition: "Expense that changes (e.g. food, transport).",
+          category: "Budgeting"
+        },
+        {
+          term: "Emergency fund",
+          definition: "Cash buffer for unexpected expenses.",
+          category: "Budgeting"
+        },
+        {
+          term: "Sinking fund",
+          definition: "Savings set aside for known future expenses.",
+          category: "Budgeting"
+        },
+        {
+          term: "Interest",
+          definition: "Cost of borrowing money, or savings, expressed as a rate.",
+          category: "Saving & investing"
+        },
+        {
+          term: "Compound interest",
+          definition: "Interest earned on interest.",
+          category: "snowball effect"
+        },
+        {
+          term: "Term deposit",
+          definition: "Locked savings at a set rate at a fixed return.",
+          category: "Saving & investing"
+        },
+        {
+          term: "ETF (Exchange-Traded Fund)",
+          definition: "A basket of assets you can buy like a share.",
+          category: "Saving & investing"
+        },
+        {
+          term: "Index fund",
+          definition: "Fund that tracks a market index (e.g. ASX 200).",
+          category: "Saving & investing"
+        },
+        {
+          term: "Diversification",
+          definition: "Spread money across assets to reduce risk.",
+          category: "Saving & investing"
+        },
+        {
+          term: "Risk vs return",
+          definition: "Higher potential returns usually mean higher risk.",
+          category: "Saving & investing"
+        },
+        {
+          term: "Credit score",
+          definition: "Number summarising how risky you are to lend to.",
+          category: "Credit & debt"
+        },
+        {
+          term: "Credit report",
+          definition: "Your credit history: loans, cards, repayments.",
+          category: "Credit & debt"
+        },
+        {
+          term: "Interest rate (APR)",
+          definition: "Yearly cost of a loan/card (often promo rate).",
+          category: "Credit & debt"
+        },
+        {
+          term: "Minimum repayment",
+          definition: "Smallest amount you must pay each period.",
+          category: "Credit & debt"
+        },
+        {
+          term: "Balance transfer",
+          definition: "Move card debt to a new card (often promo rate).",
+          category: "Credit & debt"
+        },
+        {
+          term: "BNPL (Buy Now, Pay Later)",
+          definition: "Pay in instalments.",
+          category: "fees for late/missed payments"
+        },
+        {
+          term: "Late fee",
+          definition: "Charge for missing a payment deadline.",
+          category: "Credit & debt"
+        },
+        {
+          term: "Default",
+          definition: "Serious missed payment recorded on your credit file.",
+          category: "Credit & debt"
+        },
+        {
+          term: "Debt-to-income ratio (DTI)",
+          definition: "How much debt vs income - key for home loans.",
+          category: "Credit & debt"
+        }
+      ]
+    }
+  },
+  methods: {
+    calculateTax() {
+      const salary = parseFloat(this.grossSalary.replace(/,/g, '')) || 0
+      
+      // Australian tax brackets for 2023-24
+      let incomeTax = 0
+      if (salary > 18200) {
+        if (salary <= 45000) {
+          incomeTax = (salary - 18200) * 0.19
+        } else if (salary <= 120000) {
+          incomeTax = 5092 + (salary - 45000) * 0.325
+        } else if (salary <= 180000) {
+          incomeTax = 29467 + (salary - 120000) * 0.37
+        } else {
+          incomeTax = 51667 + (salary - 180000) * 0.45
+        }
+      }
+      
+      // Medicare levy (2%)
+      const medicareLevy = salary * 0.02
+      
+      // Superannuation (11.5%)
+      const superannuation = salary * 0.115
+      
+      // Net pay
+      const netPay = salary - incomeTax - medicareLevy
+      
+      this.calculatedResults = {
+        incomeTax: Math.round(incomeTax),
+        medicareLevy: Math.round(medicareLevy),
+        netPay: Math.round(netPay),
+        superannuation: Math.round(superannuation)
+      }
+    },
+    formatNumber(num) {
+      return num.toLocaleString()
+    },
+    nextCard() {
+      this.currentCardIndex = (this.currentCardIndex + 1) % this.taxTerms.length
+    },
+    prevCard() {
+      this.currentCardIndex = this.currentCardIndex === 0 ? this.taxTerms.length - 1 : this.currentCardIndex - 1
+    },
+    getCurrentTerm() {
+      return this.taxTerms[this.currentCardIndex]
+    },
+    getCategoryColor(category) {
+      const colors = {
+        'Superannuation': 'blue',
+        'Banking & payments': 'green', 
+        'Budgeting': 'purple',
+        'Saving & investing': 'orange',
+        'Credit & debt': 'red',
+        'Interest not repaid': 'red',
+        'fees/interest apply': 'red',
+        'snowball effect': 'orange',
+        'fees for late/missed payments': 'red'
+      }
+      return colors[category] || 'gray'
     }
   }
 }
@@ -685,6 +913,66 @@ export default {
 
 .concept-link:hover {
   text-decoration: underline;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 12px;
+}
+
+.category-badge.blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.category-badge.green {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.category-badge.purple {
+  background: #faf5ff;
+  color: #a855f7;
+}
+
+.category-badge.orange {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.category-badge.red {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.category-badge.gray {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.navigation-hints {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.hint-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.hint-icon {
+  font-size: 14px;
+  color: #9ca3af;
 }
 
 .concept-items {

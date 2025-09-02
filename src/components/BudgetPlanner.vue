@@ -119,135 +119,50 @@
           <p>Real-time monitoring of your spending patterns to help you stay within budget limits</p>
           
           <div class="alerts-grid">
-            <div class="alert-card warning">
+            <div
+              v-for="cat in categories"
+              :key="cat.key"
+              class="alert-card"
+              :class="statusClass(cat)"
+            >
               <div class="alert-header">
-                <h4>Housing</h4>
-                <div class="alert-icon">⚠️</div>
+                <h4>{{ cat.name }}</h4>
+                <div class="alert-icon">{{ statusIcon(cat) }}</div>
               </div>
               <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$1,800</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$2,000</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill warning" style="width: 90%"></div>
-                </div>
-                <div class="alert-status">90% used - Warning</div>
-                <button class="adjust-btn">Adjust Budget</button>
-              </div>
-            </div>
-
-            <div class="alert-card exceeded">
-              <div class="alert-header">
-                <h4>Transportation</h4>
-                <div class="alert-icon">🚫</div>
-              </div>
-              <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$650</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$500</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill exceeded" style="width: 100%"></div>
-                </div>
-                <div class="alert-status">130% used - Exceeded</div>
-                <button class="adjust-btn">Adjust Budget</button>
-              </div>
-            </div>
-
-            <div class="alert-card good">
-              <div class="alert-header">
-                <h4>Food & Dining</h4>
-                <div class="alert-icon">✅</div>
-              </div>
-              <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$400</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$600</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill good" style="width: 67%"></div>
-                </div>
-                <div class="alert-status">67% used - Good</div>
-                <button class="adjust-btn">Adjust Budget</button>
-              </div>
-            </div>
-
-            <div class="alert-card good">
-              <div class="alert-header">
-                <h4>Entertainment</h4>
-                <div class="alert-icon">✅</div>
-              </div>
-              <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$200</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$300</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill good" style="width: 67%"></div>
-                </div>
-                <div class="alert-status">67% used - Good</div>
-                <button class="adjust-btn">Adjust Budget</button>
-              </div>
-            </div>
-
-            <div class="alert-card good">
-              <div class="alert-header">
-                <h4>Healthcare</h4>
-                <div class="alert-icon">✅</div>
-              </div>
-              <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$150</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$200</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill good" style="width: 75%"></div>
-                </div>
-                <div class="alert-status">75% used - Good</div>
-                <button class="adjust-btn">Adjust Budget</button>
-              </div>
-            </div>
-
-            <div class="alert-card exceeded">
-              <div class="alert-header">
-                <h4>Shopping</h4>
-                <div class="alert-icon">🚫</div>
-              </div>
-              <div class="alert-content">
-                <div class="alert-row">
-                  <span>Spent</span>
-                  <span>$450</span>
-                </div>
-                <div class="alert-row">
-                  <span>Budget</span>
-                  <span>$400</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill exceeded" style="width: 100%"></div>
-                </div>
-                <div class="alert-status">113% used - Exceeded</div>
-                <button class="adjust-btn">Adjust Budget</button>
+                <template v-if="!cat.isEditing">
+                  <div class="alert-row">
+                    <span>Spent</span>
+                    <span>${{ formatNumber(cat.spent) }}</span>
+                  </div>
+                  <div class="alert-row">
+                    <span>Budget</span>
+                    <span>${{ formatNumber(cat.budget) }}</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div
+                      class="progress-fill"
+                      :class="barClass(cat)"
+                      :style="{ width: progressWidth(cat) }"
+                    ></div>
+                  </div>
+                  <div class="alert-status">{{ percentUsed(cat) }}% used - {{ statusText(cat) }}</div>
+                  <button class="adjust-btn" @click="startEdit(cat)">Adjust Budget</button>
+                </template>
+                <template v-else>
+                  <div class="form-group">
+                    <label>Spent</label>
+                    <input type="number" v-model="cat.formSpent" placeholder="Enter spent">
+                  </div>
+                  <div class="form-group">
+                    <label>Budget</label>
+                    <input type="number" v-model="cat.formBudget" placeholder="Enter budget">
+                  </div>
+                  <div class="adjust-buttons">
+                    <button class="adjust-btn primary" @click="applyEdit(cat)">Calculate</button>
+                    <button class="adjust-btn secondary" @click="cancelEdit(cat)">Cancel</button>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -497,31 +412,85 @@ export default {
       chart.setOption(option)
     }
     
-    const totalIncome = computed(() => {
-      const salary = parseFloat(income.value.salary) || 0
-      const investments = parseFloat(income.value.investments) || 0
-      const other = parseFloat(income.value.other) || 0
-      return salary + investments + other
-    })
-    
-    const totalExpenses = computed(() => {
-      const housing = parseFloat(expenses.value.housing) || 0
-      const transportation = parseFloat(expenses.value.transportation) || 0
-      const food = parseFloat(expenses.value.food) || 0
-      const entertainment = parseFloat(expenses.value.entertainment) || 0
-      const healthcare = parseFloat(expenses.value.healthcare) || 0
-      return housing + transportation + food + entertainment + healthcare
-    })
-    
-    const balance = computed(() => {
-      return totalIncome.value - totalExpenses.value
-    })
+    // 初始化为0，只有点击Calculate Budget后才计算
+    const totalIncome = ref(0)
+    const totalExpenses = ref(0)
+    const balance = ref(0)
+
+    // Overspending Alerts - dynamic categories with edit/apply flow
+    const categories = ref([
+      { key: 'housing', name: 'Housing', spent: 1800, budget: 2000, isEditing: false, formSpent: '', formBudget: '' },
+      { key: 'transportation', name: 'Transportation', spent: 650, budget: 500, isEditing: false, formSpent: '', formBudget: '' },
+      { key: 'food', name: 'Food & Dining', spent: 400, budget: 600, isEditing: false, formSpent: '', formBudget: '' },
+      { key: 'entertainment', name: 'Entertainment', spent: 200, budget: 300, isEditing: false, formSpent: '', formBudget: '' },
+      { key: 'healthcare', name: 'Healthcare', spent: 150, budget: 200, isEditing: false, formSpent: '', formBudget: '' },
+      { key: 'shopping', name: 'Shopping', spent: 450, budget: 400, isEditing: false, formSpent: '', formBudget: '' }
+    ])
+
+    const percentUsed = (cat) => {
+      const spent = parseFloat(cat.spent) || 0
+      const budget = parseFloat(cat.budget) || 0
+      if (budget <= 0) return spent > 0 ? 100 : 0
+      return Math.round((spent / budget) * 100)
+    }
+
+    const statusClass = (cat) => {
+      const p = percentUsed(cat)
+      if (p > 100) return 'exceeded'
+      if (p >= 90) return 'warning'
+      return 'good'
+    }
+
+    const barClass = (cat) => {
+      const cls = statusClass(cat)
+      if (cls === 'exceeded') return 'exceeded'
+      if (cls === 'warning') return 'warning'
+      return 'good'
+    }
+
+    const progressWidth = (cat) => {
+      const p = percentUsed(cat)
+      return Math.min(p, 100) + '%'
+    }
+
+    const statusText = (cat) => {
+      const p = percentUsed(cat)
+      if (p > 100) return 'Exceeded'
+      if (p >= 90) return 'Warning'
+      return 'Good'
+    }
+
+    const statusIcon = (cat) => {
+      const p = percentUsed(cat)
+      if (p > 100) return '🚫'
+      if (p >= 90) return '⚠️'
+      return '✅'
+    }
+
+    const startEdit = (cat) => {
+      cat.formSpent = cat.spent.toString()
+      cat.formBudget = cat.budget.toString()
+      cat.isEditing = true
+    }
+
+    const cancelEdit = (cat) => {
+      cat.formSpent = ''
+      cat.formBudget = ''
+      cat.isEditing = false
+    }
+
+    const applyEdit = (cat) => {
+      const s = parseFloat(cat.formSpent) || 0
+      const b = parseFloat(cat.formBudget) || 0
+      cat.spent = s
+      cat.budget = b
+      cat.formSpent = ''
+      cat.formBudget = ''
+      cat.isEditing = false
+      console.log(`Updated ${cat.name}: spent=${s}, budget=${b}`)
+    }
     
 
-    
-    watch([expenses], () => {
-      updateChart()
-    }, { deep: true })
     
     // Set default values
     income.value.salary = '5800'
@@ -533,7 +502,37 @@ export default {
     expenses.value.entertainment = '200'
     expenses.value.healthcare = '150'
     
+    // 初始计算一次，显示默认值
+    const salaryVal = parseFloat(income.value.salary) || 0
+    const investmentsVal = parseFloat(income.value.investments) || 0
+    const otherVal = parseFloat(income.value.other) || 0
+    totalIncome.value = salaryVal + investmentsVal + otherVal
+    
+    const housingVal = parseFloat(expenses.value.housing) || 0
+    const transportationVal = parseFloat(expenses.value.transportation) || 0
+    const foodVal = parseFloat(expenses.value.food) || 0
+    const entertainmentVal = parseFloat(expenses.value.entertainment) || 0
+    const healthcareVal = parseFloat(expenses.value.healthcare) || 0
+    totalExpenses.value = housingVal + transportationVal + foodVal + entertainmentVal + healthcareVal
+    
+    balance.value = totalIncome.value - totalExpenses.value
+    
     const calculateBudget = () => {
+      // Calculate totals
+      const salaryVal = parseFloat(income.value.salary) || 0
+      const investmentsVal = parseFloat(income.value.investments) || 0
+      const otherVal = parseFloat(income.value.other) || 0
+      totalIncome.value = salaryVal + investmentsVal + otherVal
+      
+      const housingVal = parseFloat(expenses.value.housing) || 0
+      const transportationVal = parseFloat(expenses.value.transportation) || 0
+      const foodVal = parseFloat(expenses.value.food) || 0
+      const entertainmentVal = parseFloat(expenses.value.entertainment) || 0
+      const healthcareVal = parseFloat(expenses.value.healthcare) || 0
+      totalExpenses.value = housingVal + transportationVal + foodVal + entertainmentVal + healthcareVal
+      
+      balance.value = totalIncome.value - totalExpenses.value
+      
       console.log('Budget calculated!')
       updateChart()
     }
@@ -677,6 +676,7 @@ export default {
       totalIncome,
       totalExpenses,
       balance,
+      categories,
       calculateBudget,
       savingsGoal,
       duration,
@@ -687,7 +687,16 @@ export default {
       weeklyAmount,
       amountToSave,
       calculateSavings,
-      formatNumber
+      formatNumber,
+      percentUsed,
+      statusClass,
+      statusText,
+      barClass,
+      progressWidth,
+      statusIcon,
+      startEdit,
+      cancelEdit,
+      applyEdit
     }
   }
 }
@@ -1095,10 +1104,59 @@ export default {
   border-radius: 6px;
   font-size: 0.875rem;
   cursor: pointer;
+  flex: 1;
 }
 
 .adjust-btn:hover {
   background: #f1f5f9;
+}
+
+.adjust-btn.primary {
+  background: #4F46E5;
+  color: white;
+  border-color: #4F46E5;
+}
+
+.adjust-btn.primary:hover {
+  background: #4338CA;
+}
+
+.adjust-btn.secondary {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.adjust-btn.secondary:hover {
+  background: #dc2626;
+}
+
+.adjust-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Fix form inputs in alert cards */
+.alert-card .form-group {
+  margin-bottom: 0.75rem;
+}
+
+.alert-card .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.alert-card .form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
 }
 
 .chart-center-text {

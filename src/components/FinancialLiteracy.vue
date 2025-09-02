@@ -42,143 +42,35 @@
     <div class="main-content">
       <!-- Learning Modules Grid -->
       <div class="modules-grid">
-        <!-- Understanding Inflation Module -->
-        <div class="module-card">
+        <div v-for="module in modules" :key="module.id" class="module-card">
           <div class="module-image">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f4ff'/%3E%3Cpath d='M50 150 L80 130 L110 140 L140 110 L170 120 L200 90 L230 100 L250 70' stroke='%234f46e5' stroke-width='3' fill='none'/%3E%3Cpath d='M250 70 L245 80 L255 80 Z' fill='%234f46e5'/%3E%3Crect x='60' y='140' width='15' height='10' fill='%23e5e7eb'/%3E%3Crect x='90' y='130' width='15' height='20' fill='%23e5e7eb'/%3E%3Crect x='120' y='120' width='15' height='30' fill='%23e5e7eb'/%3E%3Crect x='150' y='110' width='15' height='40' fill='%23e5e7eb'/%3E%3Crect x='180' y='100' width='15' height='50' fill='%23e5e7eb'/%3E%3C/svg%3E" alt="Understanding Inflation">
+            <div class="video-thumbnail" :style="{ backgroundImage: `url(https://img.youtube.com/vi/${module.videoId}/maxresdefault.jpg)` }">
+              <div class="play-overlay">
+                <div class="play-button">▶</div>
+              </div>
+            </div>
           </div>
           <div class="module-content">
-            <h3 class="module-title">Understanding Inflation</h3>
+            <h3 class="module-title">{{ module.title }}</h3>
             <div class="module-rating">
               <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
+                <span 
+                  v-for="i in 5" 
+                  :key="i" 
+                  class="star" 
+                  :class="{ 'filled': i <= getStarRating(module.rating).fullStars }"
+                >★</span>
               </div>
-              <span class="rating-value">5.0</span>
+              <span class="rating-value">{{ module.rating.toFixed(1) }}</span>
             </div>
             <p class="module-description">
-              Learn how inflation affects your purchasing power and investment decisions.
+              {{ module.description }}
             </p>
             <div class="module-meta">
-              <span class="duration">⏱ 45 mins</span>
-              <span class="difficulty easy">Easy</span>
+              <span class="duration">⏱ {{ module.duration }}</span>
+              <span class="difficulty" :class="module.difficulty.toLowerCase()">{{ module.difficulty }}</span>
             </div>
-            <button class="start-learning-btn">Start Learning</button>
-          </div>
-        </div>
-
-        <!-- Smart Budgeting Module -->
-        <div class="module-card">
-          <div class="module-image">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0f9ff'/%3E%3Crect x='60' y='60' width='180' height='120' rx='8' fill='white' stroke='%23e5e7eb'/%3E%3Crect x='80' y='80' width='60' height='40' rx='4' fill='%2306b6d4'/%3E%3Crect x='80' y='130' width='140' height='8' rx='4' fill='%23e5e7eb'/%3E%3Crect x='80' y='145' width='100' height='8' rx='4' fill='%23e5e7eb'/%3E%3Crect x='80' y='160' width='120' height='8' rx='4' fill='%23e5e7eb'/%3E%3Ctext x='190' y='95' font-family='Arial' font-size='12' fill='%234f46e5'%3E$2,500%3C/text%3E%3C/svg%3E" alt="Smart Budgeting">
-          </div>
-          <div class="module-content">
-            <h3 class="module-title">Smart Budgeting</h3>
-            <div class="module-rating">
-              <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-              </div>
-              <span class="rating-value">5.0</span>
-            </div>
-            <p class="module-description">
-              Master the art of creating and maintaining effective personal budgets.
-            </p>
-            <div class="module-meta">
-              <span class="duration">⏱ 60 mins</span>
-              <span class="difficulty easy">Easy</span>
-            </div>
-            <button class="start-learning-btn">Start Learning</button>
-          </div>
-        </div>
-
-        <!-- Saving Strategies Module -->
-        <div class="module-card">
-          <div class="module-image">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23fef3e2'/%3E%3Ccircle cx='150' cy='100' r='40' fill='%23f59e0b' opacity='0.2'/%3E%3Cpath d='M130 90 Q150 70 170 90 Q150 110 130 90' fill='%23f59e0b'/%3E%3Crect x='80' y='130' width='15' height='30' rx='2' fill='%23d97706'/%3E%3Crect x='100' y='120' width='15' height='40' rx='2' fill='%23d97706'/%3E%3Crect x='120' y='110' width='15' height='50' rx='2' fill='%23d97706'/%3E%3Crect x='140' y='100' width='15' height='60' rx='2' fill='%23d97706'/%3E%3Crect x='160' y='90' width='15' height='70' rx='2' fill='%23d97706'/%3E%3Crect x='180' y='80' width='15' height='80' rx='2' fill='%23d97706'/%3E%3Crect x='200' y='70' width='15' height='90' rx='2' fill='%23d97706'/%3E%3C/svg%3E" alt="Saving Strategies">
-          </div>
-          <div class="module-content">
-            <h3 class="module-title">Saving Strategies</h3>
-            <div class="module-rating">
-              <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star">★</span>
-              </div>
-              <span class="rating-value">4.0</span>
-            </div>
-            <p class="module-description">
-              Discover proven methods to build your emergency fund and savings goals.
-            </p>
-            <div class="module-meta">
-              <span class="duration">⏱ 50 mins</span>
-              <span class="difficulty medium">Medium</span>
-            </div>
-            <button class="start-learning-btn">Start Learning</button>
-          </div>
-        </div>
-
-        <!-- Credit Management Module -->
-        <div class="module-card">
-          <div class="module-image">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23f0fdf4'/%3E%3Crect x='70' y='80' width='160' height='100' rx='8' fill='%2316a34a'/%3E%3Crect x='80' y='90' width='140' height='60' rx='4' fill='%23dcfce7'/%3E%3Ctext x='90' y='110' font-family='Arial' font-size='10' fill='%2316a34a'%3ECREDIT CARD%3C/text%3E%3Ctext x='90' y='130' font-family='Arial' font-size='8' fill='%2316a34a'%3E•••• •••• •••• 1234%3C/text%3E%3Crect x='190' y='95' width='30' height='20' rx='2' fill='%2316a34a'/%3E%3Crect x='80' y='160' width='40' height='8' rx='2' fill='%23dcfce7'/%3E%3C/svg%3E" alt="Credit Management">
-          </div>
-          <div class="module-content">
-            <h3 class="module-title">Credit Management</h3>
-            <div class="module-rating">
-              <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star">★</span>
-              </div>
-              <span class="rating-value">4.0</span>
-            </div>
-            <p class="module-description">
-              Build and maintain excellent credit while avoiding common pitfalls.
-            </p>
-            <div class="module-meta">
-              <span class="duration">⏱ 75 mins</span>
-              <span class="difficulty medium">Medium</span>
-            </div>
-            <button class="start-learning-btn">Start Learning</button>
-          </div>
-        </div>
-
-        <!-- Investment Fundamentals Module -->
-        <div class="module-card">
-          <div class="module-image">
-            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='%23faf5ff'/%3E%3Cpath d='M50 150 Q80 120 110 130 Q140 100 170 110 Q200 80 230 90 Q250 70 270 80' stroke='%237c3aed' stroke-width='3' fill='none'/%3E%3Cpath d='M270 80 L265 85 L270 90 L275 85 Z' fill='%237c3aed'/%3E%3Crect x='60' y='140' width='12' height='20' fill='%23c4b5fd'/%3E%3Crect x='80' y='130' width='12' height='30' fill='%23c4b5fd'/%3E%3Crect x='100' y='120' width='12' height='40' fill='%23c4b5fd'/%3E%3Crect x='120' y='110' width='12' height='50' fill='%23c4b5fd'/%3E%3Crect x='140' y='100' width='12' height='60' fill='%23c4b5fd'/%3E%3Crect x='160' y='90' width='12' height='70' fill='%23c4b5fd'/%3E%3Crect x='180' y='80' width='12' height='80' fill='%23c4b5fd'/%3E%3C/svg%3E" alt="Investment Fundamentals">
-          </div>
-          <div class="module-content">
-            <h3 class="module-title">Investment Fundamentals</h3>
-            <div class="module-rating">
-              <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-              </div>
-              <span class="rating-value">5.0</span>
-            </div>
-            <p class="module-description">
-              Start your investment journey with solid foundations and risk management.
-            </p>
-            <div class="module-meta">
-              <span class="duration">⏱ 90 mins</span>
-              <span class="difficulty advanced">Advanced</span>
-            </div>
-            <button class="start-learning-btn">Start Learning</button>
+            <button class="start-learning-btn" @click="startLearning(module)">Start Learning</button>
           </div>
         </div>
       </div>
@@ -206,6 +98,35 @@
         </div>
       </div>
     </div>
+
+    <!-- Video Player Modal -->
+    <div v-if="showVideoPlayer" class="video-modal" @click="closeVideoPlayer">
+      <div class="video-modal-content" @click.stop>
+        <div class="video-header">
+          <h3 class="video-title">{{ selectedModule?.title }}</h3>
+          <button class="close-btn" @click="closeVideoPlayer">✕</button>
+        </div>
+        <div class="video-container">
+          <iframe
+            v-if="selectedModule"
+            :src="`https://www.youtube.com/embed/${selectedModule.videoId}?autoplay=1&rel=0`"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+            class="video-player"
+          ></iframe>
+        </div>
+        <div class="video-info">
+          <p class="video-description">{{ selectedModule?.description }}</p>
+          <div class="video-meta">
+            <span class="video-duration">⏱ {{ selectedModule?.duration }}</span>
+            <span class="video-difficulty" :class="selectedModule?.difficulty.toLowerCase()">
+              {{ selectedModule?.difficulty }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -214,13 +135,76 @@ export default {
   name: 'FinancialLiteracy',
   data() {
     return {
-      searchQuery: ''
+      searchQuery: '',
+      selectedModule: null,
+      showVideoPlayer: false,
+      modules: [
+        {
+          id: 1,
+          title: 'Understanding Inflation',
+          description: 'Learn how inflation affects your purchasing power and investment decisions.',
+          duration: '45 mins',
+          difficulty: 'Easy',
+          rating: 5.0,
+          videoId: 'HQ-Kg_xgdhE',
+          videoUrl: 'https://youtu.be/HQ-Kg_xgdhE?si=1AcfezQ0o7bLIPPr'
+        },
+        {
+          id: 2,
+          title: 'Smart Budgeting',
+          description: 'Master the art of creating and maintaining effective personal budgets.',
+          duration: '60 mins',
+          difficulty: 'Easy',
+          rating: 5.0,
+          videoId: 'V59GNErtt48',
+          videoUrl: 'https://youtu.be/V59GNErtt48?si=HndLVw50O31VOa1s'
+        },
+        {
+          id: 3,
+          title: 'Saving Strategies',
+          description: 'Discover proven methods to build your emergency fund and savings goals.',
+          duration: '50 mins',
+          difficulty: 'Medium',
+          rating: 4.0,
+          videoId: 'JP__utZQLb8',
+          videoUrl: 'https://youtu.be/JP__utZQLb8?si=KdNE0zdxbif-ghmu'
+        },
+        {
+          id: 4,
+          title: 'Credit Management',
+          description: 'Build and maintain excellent credit while avoiding common pitfalls.',
+          duration: '75 mins',
+          difficulty: 'Medium',
+          rating: 4.0,
+          videoId: '1yPgUHsjUTc',
+          videoUrl: 'https://youtu.be/1yPgUHsjUTc?si=4vV_pALwKLGKOPBg'
+        },
+        {
+          id: 5,
+          title: 'Investment Fundamentals',
+          description: 'Start your investment journey with solid foundations and risk management.',
+          duration: '90 mins',
+          difficulty: 'Advanced',
+          rating: 5.0,
+          videoId: '3BOE1A8HXeE',
+          videoUrl: 'https://youtu.be/3BOE1A8HXeE?si=z2N3aLLyfmHyUvw9'
+        }
+      ]
     }
   },
   methods: {
-    startLearning(moduleTitle) {
-      console.log(`Starting learning: ${moduleTitle}`)
-      // 这里可以添加具体的学习逻辑
+    startLearning(module) {
+      this.selectedModule = module
+      this.showVideoPlayer = true
+    },
+    closeVideoPlayer() {
+      this.showVideoPlayer = false
+      this.selectedModule = null
+    },
+    getStarRating(rating) {
+      const fullStars = Math.floor(rating)
+      const hasHalfStar = rating % 1 !== 0
+      return { fullStars, hasHalfStar }
     }
   }
 }
@@ -382,12 +366,63 @@ export default {
   width: 100%;
   height: 200px;
   overflow: hidden;
+  position: relative;
 }
 
 .module-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.video-thumbnail {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.video-thumbnail:hover {
+  transform: scale(1.02);
+}
+
+.play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.video-thumbnail:hover .play-overlay {
+  opacity: 1;
+}
+
+.play-button {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #4f46e5;
+  transition: transform 0.2s;
+}
+
+.play-button:hover {
+  transform: scale(1.1);
 }
 
 .module-content {
@@ -559,6 +594,106 @@ export default {
   font-weight: 500;
 }
 
+/* Video Modal Styles */
+.video-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.video-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.video-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.video-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  background: #000;
+}
+
+.video-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-info {
+  padding: 24px;
+}
+
+.video-description {
+  font-size: 16px;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.video-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.video-duration {
+  color: #6b7280;
+}
+
+.video-difficulty {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
@@ -581,6 +716,22 @@ export default {
   .progress-stats {
     flex-direction: column;
     gap: 24px;
+  }
+  
+  .video-modal {
+    padding: 10px;
+  }
+  
+  .video-modal-content {
+    max-height: 95vh;
+  }
+  
+  .video-header {
+    padding: 16px;
+  }
+  
+  .video-info {
+    padding: 16px;
   }
 }
 </style>

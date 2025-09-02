@@ -10,12 +10,12 @@
           <span class="logo-text">EduFinance</span>
         </div>
         <ul class="nav-links">
-          <li><a href="#" @click.prevent="navigateTo('mortgage-calculator')">Calculator</a></li>
-          <li><a href="#" @click.prevent="navigateTo('budget-planner')">Budget</a></li>
-          <li><a href="#" @click.prevent="navigateTo('financial-literacy')">Financial</a></li>
-          <li><a href="#" @click.prevent="navigateTo('cost-estimator')">Cost Estimator</a></li>
-          <li><a href="#" @click.prevent="navigateTo('tax-learn')">TaxLearn</a></li>
-          <li><a href="#" @click.prevent="navigateTo('mortgage-calculator')" class="btn btn-primary">Get Started</a></li>
+          <li><a href="#mortgage-calculator" :class="{ active: currentRoute === 'mortgage-calculator' }">Calculator</a></li>
+          <li><a href="#budget-planner" :class="{ active: currentRoute === 'budget-planner' }">Budget</a></li>
+          <li><a href="#financial-literacy" :class="{ active: currentRoute === 'financial-literacy' }">Financial</a></li>
+          <li><a href="#cost-estimator" :class="{ active: currentRoute === 'cost-estimator' }">Cost Estimator</a></li>
+          <li><a href="#tax-learn" :class="{ active: currentRoute === 'tax-learn' }">TaxLearn</a></li>
+          <li><a href="#savings-goal-calculator" class="btn btn-primary">Get Started</a></li>
         </ul>
       </nav>
     </div>
