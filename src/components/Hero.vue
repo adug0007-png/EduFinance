@@ -1,22 +1,21 @@
-
 <template>
+  <section class="hero-ww">
+    <!-- 背景图 -->
+    <div class="hero-bg">
+      <img src="../assets/home.jpg" alt="" />
+      <div class="overlay"></div>
+    </div>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-grid">
-        <!-- 左侧卡片：标题、文案与按钮 -->
-        <div class="hero-card">
-          <h1 class="hero-title">Plan Your Education Journey & Learn...</h1>
-          <p class="hero-subtitle">Master financial literacy while planning your educational future. Get personalized cost estimates and learn essential money management skills for life.</p>
-          <div class="hero-buttons">
-            <button class="btn btn-primary" @click="navigateTo('savings-goal-calculator')" >Get Started</button>
-          </div>
-        </div>
-        <!-- 右侧图片：不在卡片内 -->
-        <div class="hero-image-wrapper" aria-hidden="true">
-          <img src="../assets/hero-illustration.svg" alt="Education planning illustration" class="hero-image" />
-        </div>
-      </div>
+    <!-- 内容叠加 -->
+    <div class="hero-content">
+      <h1 class="hero-title a-fade-up a-delay-0">Grow your wealth</h1>
+      <p class="hero-subtitle a-fade-up a-delay-1">
+        Plan smarter, save faster, and build lasting financial confidence with WealthWave.
+      </p>
+      <button class="btn-primary a-fade-up a-delay-2"
+              @click="navigateTo('savings-goal-calculator')">
+        Get Started
+      </button>
     </div>
   </section>
 </template>
@@ -27,91 +26,95 @@ const navigateTo = inject('navigateTo')
 </script>
 
 <style scoped>
-.hero { padding: 88px 0; }
-
-/* 新版：两列布局，仅左侧为卡片 */
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  align-items: stretch;
-  gap: 40px;
+/* ===== Base layout ===== */
+.hero-ww {
+  position: relative;
+  width: 100%;
+  height: clamp(420px, 80vh, 680px);
+  overflow: hidden;
 }
 
-.hero-card {
-  background: #fff;
-  border: 1px solid var(--border-color);
-  /* 顶部边线更淡，底部阴影更重 */
-  border-top-color: rgba(229, 231, 235, 0.45);
-  border-left-color: rgba(229, 231, 235, 0.85);
-  border-right-color: rgba(229, 231, 235, 0.85);
-  border-bottom-color: rgba(229, 231, 235, 1);
-  border-radius: var(--radius-xl, 20px);
-  /* 底部偏重的阴影效果 */
-  box-shadow: 0 22px 36px -12px rgba(0,0,0,0.14), 0 4px 10px rgba(0,0,0,0.04);
-  padding: 40px;
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; }
+
+.hero-bg .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,.25) 0%,
+    rgba(0,0,0,.35) 40%,
+    rgba(0,0,0,.55) 100%
+  );
+}
+
+/* 底部渐变过渡到白色 */
+.hero-bg .overlay::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 90px; /* 可调 60-120px */
+  background: linear-gradient(to bottom, transparent, #fff);
+}
+
+/* 内容居中叠加 */
+.hero-content {
+  position: relative; z-index: 2;
   height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; color: #fff; padding: 0 16px;
 }
 
 .hero-title {
-  font-size: 52px;
   font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-  margin: 0 0 20px;
+  font-size: clamp(42px, 8vw, 92px);
+  line-height: 1.05;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 12px rgba(0,0,0,.45);
 }
 
 .hero-subtitle {
-  font-size: 18px;
-  color: var(--muted-text-color);
-  margin: 0 0 28px;
+  font-size: clamp(16px, 2vw, 20px);
+  max-width: 720px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+  color: #e5e7eb;
+  text-shadow: 0 2px 8px rgba(0,0,0,.4);
 }
 
-.hero-buttons { display: flex; gap: 16px; }
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  padding: 0 28px;
-  border-radius: 10px;
-  font-weight: 600;
+/* 按钮 */
+.btn-primary {
+  padding: 14px 28px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  color: #fff;
+  font-weight: 700;
   font-size: 16px;
-  transition: all .2s ease;
+  border: none;
   cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
 }
 
-/* 主按钮：实心紫底白字（Get Started 白字） */
-.btn-primary { background: var(--primary-color); color: #fff; border: none; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,.25); }
-
-/* 次按钮：蓝色描边 + 蓝色文字 */
-.btn-secondary { background: #fff; color: var(--primary-color); border: 1px solid var(--primary-color); }
-.btn-secondary:hover { transform: translateY(-1px); background: rgba(79,70,229,0.06); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
-
-/* 右侧图片独立展示，不包裹在卡片中：纯 CSS 等高 */
-.hero-image-wrapper { display: flex; justify-content: center; align-items: center; align-self: stretch; }
-.hero-image {
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-  object-fit: cover;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.10);
+/* ===== Animations ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px) scale(.98); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0) scale(1);      filter: blur(0); }
 }
 
-@media (max-width: 992px) {
-  .hero { padding: 72px 0; }
-  .hero-grid { grid-template-columns: 1fr; gap: 28px; }
-  .hero-title { font-size: 42px; }
-  .hero-buttons { justify-content: center; }
-  .hero-card { height: auto; }
-  .hero-image-wrapper { height: auto; }
-  .hero-image { height: 300px; min-height: 0; }
+.a-fade-up {
+  opacity: 0; animation: fadeUp .6s cubic-bezier(.22,.9,.26,1) forwards;
 }
+.a-delay-0 { animation-delay: .05s; }
+.a-delay-1 { animation-delay: .18s; }
+.a-delay-2 { animation-delay: .32s; }
 
-@media (max-width: 576px) {
-  .btn { width: 100%; }
-  .hero-buttons { flex-direction: column; }
+@media (prefers-reduced-motion: reduce) {
+  .a-fade-up { animation: none; opacity: 1; transform: none; filter: none; }
 }
 </style>
