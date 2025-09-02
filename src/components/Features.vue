@@ -25,7 +25,7 @@
             <img src="../assets/icon-book.svg" alt="Learning icon" />
           </div>
           <div class="card-media" aria-hidden="true">
-            <img src="../assets/learning.png" alt="Learning Modules illustration" />
+            <img src="../assets/Learning.png" alt="Learning Modules illustration" />
           </div>
           <h3 class="card-title">Learning Modules</h3>
           <p class="card-description">Interactive lessons covering budgeting, saving, investing, and debt management. Build essential financial skills through engaging, bite-sized modules.</p>
