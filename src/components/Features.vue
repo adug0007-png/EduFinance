@@ -13,7 +13,7 @@
             <img src="../assets/icon-calculator.svg" alt="Calculator icon" />
           </div>
           <div class="card-media" aria-hidden="true">
-            <img src="../assets/cost-estimator.svg" alt="Cost Estimator illustration" />
+            <img src="../assets/caculator.png" alt="Cost Estimator illustration" />
           </div>
           <h3 class="card-title">Cost Estimator</h3>
           <p class="card-description">Get accurate estimates for tuition, living expenses, and total education costs. Plan your budget with confidence using our comprehensive calculation tools.</p>
@@ -25,7 +25,7 @@
             <img src="../assets/icon-book.svg" alt="Learning icon" />
           </div>
           <div class="card-media" aria-hidden="true">
-            <img src="../assets/learning-modules.svg" alt="Learning Modules illustration" />
+            <img src="../assets/learning.png" alt="Learning Modules illustration" />
           </div>
           <h3 class="card-title">Learning Modules</h3>
           <p class="card-description">Interactive lessons covering budgeting, saving, investing, and debt management. Build essential financial skills through engaging, bite-sized modules.</p>
@@ -37,7 +37,7 @@
             <img src="../assets/icon-users.svg" alt="Sharing icon" />
           </div>
           <div class="card-media" aria-hidden="true">
-            <img src="../assets/sharing-hub.svg" alt="Sharing Hub illustration" />
+            <img src="../assets/sharing.png" alt="Sharing Hub illustration" />
           </div>
           <h3 class="card-title">Sharing Hub</h3>
           <p class="card-description">Connect with peers, share experiences, and learn from others' financial journeys. Join a supportive community of students building financial literacy together.</p>
