@@ -1,10 +1,8 @@
 <!-- src/components/PageHeader.vue -->
 <template>
-  <header class="ww-header" :class="align">
+  <header class="ww-header" :class="[align, dark ? 'dark' : 'light']">
     <div class="header-inner">
-      <!-- 可选图标插槽：你在 App.vue 里已经放了小房子图标 -->
-      <div v-if="$slots.default" class="header-icon">
-      </div>
+      <div v-if="$slots.default" class="header-icon"></div>
 
       <div class="header-text">
         <Typography :variant="'main'" :tag="titleTag">
@@ -25,16 +23,18 @@ const props = defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, default: '' },
   align: { type: String, default: 'center' }, // 'center' | 'left'
-  titleTag: { type: String, default: 'h1' }   // 'h1' | 'h2' ...
+  titleTag: { type: String, default: 'h1' },
+  dark: { type: Boolean, default: false }     // kept for compatibility
 })
 </script>
 
 <style scoped>
+/* Keep nav ribbon visually unchanged; this header adds minimal spacing only */
 .ww-header {
-  background: #ffffff;
-  color: #111827;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 20px 0;
+  background: transparent;
+  border: none;
+  margin-top: 0;
+  padding: 12px 0 16px;  /* small breathing room below sticky nav */
 }
 
 .header-inner {
@@ -46,11 +46,21 @@ const props = defineProps({
   gap: 12px;
 }
 
-/* 左右/居中对齐策略 */
+/* alignment */
 .ww-header.center .header-text { text-align: center; margin: 0 auto; }
-.ww-header.left .header-text { text-align: left; }
+.ww-header.left   .header-text { text-align: left; }
 
-/* 图标外观（颜色和尺寸与你现有风格一致） */
+/* Use THEME TOKENS so colors flip with .non-home-dark and system dark mode */
+.header-text :deep(h1),
+.header-text :deep(h2),
+.header-text :deep(h3) {
+  color: var(--text-primary);
+}
+.header-text :deep(p) {
+  color: var(--text-secondary);
+}
+
+/* optional icon slot */
 .header-icon {
   width: 28px;
   height: 28px;

@@ -1,21 +1,20 @@
 <template>
-  <section class="hero-ww">
-    <!-- 背景图 -->
-    <div class="hero-bg">
-      <img src="../assets/home.jpg" alt="" />
-      <div class="overlay"></div>
-    </div>
-
-    <!-- 内容叠加 -->
-    <div class="hero-content">
-      <h1 class="hero-title a-fade-up a-delay-0">Grow your wealth</h1>
-      <p class="hero-subtitle a-fade-up a-delay-1">
-        Plan smarter, save faster, and build lasting financial confidence with WealthWave.
-      </p>
-      <button class="btn-primary a-fade-up a-delay-2"
-              @click="navigateTo('savings-goal-calculator')">
-        Get Started
-      </button>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container">
+      <div class="hero-content-box">
+        <div class="hero-content">
+          <h1 id="hero-title" class="hero-title">Know what it costs. <br>Know what to do.</h1>
+          <p class="hero-subtitle">
+            Learn the essentials and run the numbers—expenses, savings goals, tax and mortgage calculators—
+            so you can plan your study life with real figures and a plan you can actually follow.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" @click="navigateTo('financial-literacy')">
+              Explore Financial Concepts
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -26,95 +25,131 @@ const navigateTo = inject('navigateTo')
 </script>
 
 <style scoped>
-/* ===== Base layout ===== */
-.hero-ww {
+.hero {
   position: relative;
-  width: 100%;
-  height: clamp(420px, 80vh, 680px);
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
 }
 
-.hero-bg { position: absolute; inset: 0; }
-.hero-bg img { width: 100%; height: 100%; object-fit: cover; }
-
-.hero-bg .overlay {
+/* Background image stays untouched */
+.hero::before {
+  content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0,0,0,.25) 0%,
-    rgba(0,0,0,.35) 40%,
-    rgba(0,0,0,.55) 100%
-  );
+  background-image: url("/hero-bg-light.png");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: cover;
+  opacity: 1;
+  z-index: -1;
 }
 
-/* 底部渐变过渡到白色 */
-.hero-bg .overlay::after {
-  content: "";
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 90px; /* 可调 60-120px */
-  background: linear-gradient(to bottom, transparent, #fff);
+/* Swap to dark image based on OS preference (keeps your original behavior) */
+@media (prefers-color-scheme: dark) {
+  .hero::before {
+    background-image: url('/hero-bg-dark.png');
+  }
 }
 
-/* 内容居中叠加 */
-.hero-content {
-  position: relative; z-index: 2;
-  height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; color: #fff; padding: 0 16px;
+.hero .container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* The content box: semi-transparent, blur, shadow */
+.hero-content-box {
+  background: rgba(0,0,0, 0.001); /* was empty — now a subtle dark glass */
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+}
+
+/* Force white text INSIDE the box (without touching the page background/image) */
+.hero-content,
+.hero-content h1,
+.hero-content p {
+  color: var(--text-primary) !important;
 }
 
 .hero-title {
+  font-size: clamp(38px, 6vw, 52px);
   font-weight: 800;
-  font-size: clamp(42px, 8vw, 92px);
-  line-height: 1.05;
-  margin-bottom: 16px;
-  text-shadow: 0 4px 12px rgba(0,0,0,.45);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  margin: 0 0 16px;
 }
 
 .hero-subtitle {
-  font-size: clamp(16px, 2vw, 20px);
-  max-width: 720px;
-  margin: 0 auto 32px;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
   line-height: 1.6;
-  color: #e5e7eb;
-  text-shadow: 0 2px 8px rgba(0,0,0,.4);
+  margin: 0 0 20px;
+  max-width: 60ch;
 }
 
-/* 按钮 */
-.btn-primary {
-  padding: 14px 28px;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #4f46e5, #6366f1);
-  color: #fff;
-  font-weight: 700;
+.hero-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 28px;
+  border-radius: 10px;
+  font-weight: 600;
   font-size: 16px;
-  border: none;
+  transition: all .2s ease;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  transition: transform .2s ease, box-shadow .2s ease;
+  text-decoration: none;
 }
+
+.btn-primary {
+  background: #4F46E5;
+  color: #fff;
+  border: none;
+}
+
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(79,70,229,.25);
 }
 
-/* ===== Animations ===== */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px) scale(.98); filter: blur(2px); }
-  to   { opacity: 1; transform: translateY(0) scale(1);      filter: blur(0); }
+/* ------------------ Responsive ------------------ */
+
+@media (min-width: 1200px) {
+  .hero-content-box { margin-left: -100px; }
 }
 
-.a-fade-up {
-  opacity: 0; animation: fadeUp .6s cubic-bezier(.22,.9,.26,1) forwards;
+@media (max-width: 1100px) {
+  .hero::before { background-position: right 20%; }
 }
-.a-delay-0 { animation-delay: .05s; }
-.a-delay-1 { animation-delay: .18s; }
-.a-delay-2 { animation-delay: .32s; }
 
-@media (prefers-reduced-motion: reduce) {
-  .a-fade-up { animation: none; opacity: 1; transform: none; filter: none; }
+@media (max-width: 768px) {
+  .hero {
+    min-height: 80vh;
+    padding: 100px 20px 40px;
+    align-items: flex-end;
+  }
+  .hero::before {
+    background-position: center top;
+    background-size: 100% 100%;
+  }
+  .hero-content-box {
+    max-width: 100%;
+    text-align: center;
+  }
+  .hero-title, .hero-subtitle { text-align: center; }
+  .hero-buttons { justify-content: center; }
 }
 </style>

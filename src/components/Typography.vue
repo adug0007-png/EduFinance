@@ -7,43 +7,37 @@
 <script setup>
 import { computed } from 'vue'
 
-// 接收 props 来区分主标题/副标题
 const props = defineProps({
   variant: {
     type: String,
-    default: 'subtitle' // 可选: 'main' | 'subtitle'
+    default: 'subtitle' // 'main' | 'subtitle'
   },
   tag: {
     type: String,
-    default: 'p' // 主标题用 h1, 副标题用 p
+    default: 'p' // h1 for main, p for subtitle (as you use)
   }
 })
 
-const classes = computed(() => {
-  if (props.variant === 'main') {
-    return 'main-title'
-  }
-  return 'subtitle'
-})
+const classes = computed(() => (props.variant === 'main' ? 'main-title' : 'subtitle'))
 </script>
 
 <style scoped>
 .main-title {
   font-size: 2rem;        /* ~32px */
   font-weight: 700;
-  color: #111827;         /* 深灰 */
+  color: var(--text-primary);      /* THEME TOKEN */
   line-height: 1.3;
   margin-bottom: 0.75rem;
-  text-align: center;
+  text-align: inherit;             /* inherit alignment from parent (center/left) */
 }
 
 .subtitle {
   font-size: 1.125rem;    /* ~18px */
-  color: #6B7280;         /* 灰色 */
+  color: var(--text-secondary);    /* THEME TOKEN */
   line-height: 1.6;
   font-weight: 400;
   margin-top: 0.5rem;
   margin-bottom: 1.5rem;
-  text-align: center;
+  text-align: inherit;             /* inherit alignment from parent */
 }
 </style>
