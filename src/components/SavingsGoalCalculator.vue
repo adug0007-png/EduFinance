@@ -53,9 +53,15 @@
           />
         </div>
 
-        <button @click="calculateSavings" class="calculate-btn">
-          Calculate Savings Plan
-        </button>
+        <button
+              type="button"
+              class="calculate-btn"
+              @click="calculateSavings"
+            >
+              Calculate Savings Plan
+            </button>
+
+
       </div>
 
       <!-- Right Side - Results -->
@@ -411,21 +417,35 @@ export default {
   }
 
   .calculate-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    padding: 14px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 8px;
+    line-height: 1;
+    background: #4F46E5;
+    border: 1px solid #4F46E5;
+    color: #fff;
     cursor: pointer;
-    transition: background-color 0.2s;
-  }
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: .2px;
+    transition: background-color .2s, box-shadow .2s;
+}
 
-  .calculate-btn:hover {
-    background: #218838;
-  }
+.calculate-btn:hover {
+    background: #4338CA;
+    color: #fff;
+}
+
+.calculate-btn:focus-visible {
+    outline: 3px solid rgba(79, 70, 229, .35);
+    outline-offset: 2px;
+}
+
+
 
   .results-section {
     display: flex;

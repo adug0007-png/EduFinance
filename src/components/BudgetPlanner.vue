@@ -625,4 +625,43 @@ export default {
   .goal-ring { height: 180px; }
   .stacked-chart { min-height: 200px; }
 }
+
+/* Savings Goal: make the CTA visible & clickable */
+.calculator-left .form-section .calculate-savings-btn{
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid #4F46E5 !important;
+  background: #4F46E5 !important;
+
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  mix-blend-mode: normal !important;
+  text-shadow: none !important;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.calculator-left .form-section .calculate-savings-btn:hover{
+  background: #4338CA !important;
+  border-color: #4338CA !important;
+}
+
+.calculator-left .form-section .calculate-savings-btn:disabled{
+  /* prevent washed-out look if disabled is ever set */
+  opacity: 0.6 !important;
+  cursor: not-allowed;
+}
+
 </style>
