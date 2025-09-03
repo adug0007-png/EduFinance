@@ -37,6 +37,7 @@
 
         <!-- Links -->
         <ul class="nav-links" :class="{ open: menuOpen }">
+          <li><a href="#" :class="{ active: currentRoute === 'home' }" @click.prevent="go('home')">Home</a></li>
           <li><a href="#" :class="{active: currentRoute==='tax-learn'}" @click.prevent="go('tax-learn')">Tax &amp; Super</a></li>
           <li><a href="#" :class="{active: currentRoute==='financial-literacy'}" @click.prevent="go('financial-literacy')">Video Guides</a></li>
           <li><a href="#" :class="{active: currentRoute==='budget-planner'}" @click.prevent="go('budget-planner')">Budget Planner</a></li>
