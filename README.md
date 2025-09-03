@@ -108,7 +108,7 @@ npm run preview
 
 ## ✅ Code Quality for Final Release
 **Modular Codebase Design:** Features live in small, reusable pieces (calculators, flashcards, video cards, header/page-header) to keep changes isolated.  
-**Version Control with Git:** Branch-per-feature with short PRs (screenshots + what changed); clear commits for quick rollback.  
+**Version Control with Git:** Branch-per-feature with short PRs ; clear commits for quick rollback.  
 **Consistent Styling & Linting:** ESLint + Prettier; shared CSS variables for spacing/colors/light-dark; avoid `!important` unless scoped.  
 **Manual Peer Review:** Self-review + quick walkthrough with the team for logic, copy, and flows before merge.  
 **Testing Before Merge:** Smoke test key flows (nav → inputs → results), light/dark, and mobile; spot-check edge cases (empty/large values).  
