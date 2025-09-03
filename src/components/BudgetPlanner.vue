@@ -1,154 +1,138 @@
 <template>
-  
   <div class="budget-planner">
-    <!-- Main Content -->
     <div class="main-content">
       <div class="container">
-        <!-- Budget Form and Summary -->
+        <!-- 左侧表单 + 右侧 Flashcards -->
         <div class="budget-section">
-          <!-- Left Side - Form -->
+          <!-- 左侧：预算表单 -->
           <div class="form-section">
-            <!-- Monthly Income -->
+            <!-- 收入 -->
             <div class="income-section">
               <div class="section-header">
-                <div class="section-icon green">●</div>
+                <div class="section-icon green"></div>
                 <h3>Monthly Income</h3>
               </div>
-              
               <div class="form-group">
                 <label>Salary</label>
-                <input type="text" v-model="income.salary" placeholder="Enter your monthly salary">
+                <input type="text" v-model="income.salary" placeholder="Enter your monthly salary" />
               </div>
-              
               <div class="form-group">
                 <label>Investments</label>
-                <input type="text" v-model="income.investments" placeholder="Investment returns">
+                <input type="text" v-model="income.investments" placeholder="Investment returns" />
               </div>
-              
               <div class="form-group">
                 <label>Other Income</label>
-                <input type="text" v-model="income.other" placeholder="Freelance, side jobs, etc.">
+                <input type="text" v-model="income.other" placeholder="Freelance, side jobs, etc." />
               </div>
             </div>
 
-            <!-- Monthly Expenses -->
+            <!-- 支出 -->
             <div class="expenses-section">
               <div class="section-header">
-                <div class="section-icon red">●</div>
+                <div class="section-icon red"></div>
                 <h3>Monthly Expenses</h3>
               </div>
-              
               <div class="form-group">
                 <label>Housing</label>
-                <input type="text" v-model="expenses.housing" placeholder="Rent, mortgage, utilities">
+                <input type="text" v-model="expenses.housing" placeholder="Rent, mortgage, utilities" />
               </div>
-              
               <div class="form-group">
                 <label>Transportation</label>
-                <input type="text" v-model="expenses.transportation" placeholder="Car payments, gas, public transport">
+                <input type="text" v-model="expenses.transportation" placeholder="Car payments, gas, public transport" />
               </div>
-              
               <div class="form-group">
                 <label>Food & Dining</label>
-                <input type="text" v-model="expenses.food" placeholder="Groceries, restaurants">
+                <input type="text" v-model="expenses.food" placeholder="Groceries, restaurants" />
               </div>
-              
               <div class="form-group">
                 <label>Entertainment</label>
-                <input type="text" v-model="expenses.entertainment" placeholder="Movies, subscriptions, hobbies">
+                <input type="text" v-model="expenses.entertainment" placeholder="Movies, subscriptions, hobbies" />
               </div>
-              
               <div class="form-group">
                 <label>Healthcare</label>
-                <input type="text" v-model="expenses.healthcare" placeholder="Insurance, medical expenses">
+                <input type="text" v-model="expenses.healthcare" placeholder="Insurance, medical expenses" />
               </div>
             </div>
 
             <button class="calculate-btn" @click="calculateBudget">Calculate Budget</button>
           </div>
 
-          <!-- Right Side - Summary and Chart -->
+          <!-- 右侧：Flashcards（图表 <-> Alerts） -->
           <div class="summary-section">
-            <!-- Budget Summary -->
-            <div class="budget-summary">
-              <h3>Budget Summary</h3>
-              <div class="summary-item">
-                <span>Total Income</span>
-                <span class="amount green">${{ totalIncome.toLocaleString() }}</span>
+            <div class="flashcard">
+              <div class="flashcard-header">
+                <h3>{{ activeIndex === 0 ? 'Expense Distribution' : 'Overspending Alerts' }}</h3>
+                <div class="nav">
+                  <button class="nav-btn" @click="prevCard" aria-label="Previous">‹</button>
+                  <button class="nav-btn" @click="nextCard" aria-label="Next">›</button>
+                </div>
               </div>
-              <div class="summary-item">
-                <span>Total Expenses</span>
-                <span class="amount red">${{ totalExpenses.toLocaleString() }}</span>
-              </div>
-              <div class="summary-item balance">
-                <span>Balance</span>
-                <span class="amount" :class="balance >= 0 ? 'green' : 'red'">${{ balance.toLocaleString() }}</span>
-              </div>
-            </div>
 
-            <!-- Expense Distribution Chart -->
-            <div class="chart-section">
-              <div ref="chartRef" class="chart-container" style="width: 100%; height: 500px; background: #f8f9fa;"></div>
-            </div>
-          </div>
-        </div>
+              <!-- v-show：不销毁 DOM，ECharts 实例不会丢 -->
+              <div class="flashcard-body">
+                <!-- 卡片 1：支出分布（饼图） -->
+                <div v-show="activeIndex === 0" class="pane">
+                  <div class="chart-section">
+                    <div ref="chartRef" class="chart-container"></div>
+                  </div>
+                </div>
 
-        <!-- Overspending Alerts -->
-        <div class="alerts-section">
-          <h2>Overspending Alerts</h2>
-          <p>Real-time monitoring of your spending patterns to help you stay within budget limits</p>
-          
-          <div class="alerts-grid">
-            <div
-              v-for="cat in categories"
-              :key="cat.key"
-              class="alert-card"
-              :class="statusClass(cat)"
-            >
-              <div class="alert-header">
-                <h4>{{ cat.name }}</h4>
-                <div class="alert-icon">{{ statusIcon(cat) }}</div>
-              </div>
-              <div class="alert-content">
-                <template v-if="!cat.isEditing">
-                  <div class="alert-row">
-                    <span>Spent</span>
-                    <span>${{ formatNumber(cat.spent) }}</span>
+                <!-- 卡片 2：Overspending Alerts（Spent 取左侧输入；Budget 可编辑） -->
+                <div v-show="activeIndex === 1" class="pane">
+                  <div class="alerts-intro">
+                    <p class="muted">Real-time monitoring of your spending patterns</p>
                   </div>
-                  <div class="alert-row">
-                    <span>Budget</span>
-                    <span>${{ formatNumber(cat.budget) }}</span>
-                  </div>
-                  <div class="progress-bar">
+                  <div class="alerts-grid compact">
                     <div
-                      class="progress-fill"
-                      :class="barClass(cat)"
-                      :style="{ width: progressWidth(cat) }"
-                    ></div>
+                      v-for="item in alertCards"
+                      :key="item.key"
+                      class="alert-card"
+                      :class="statusClass(item)"
+                    >
+                      <div class="alert-header">
+                        <h4>{{ item.name }}</h4>
+                        <div class="alert-icon">{{ statusIcon(item) }}</div>
+                      </div>
+
+                      <div class="alert-content">
+                        <div class="alert-row">
+                          <span>Spent</span>
+                          <span>${{ formatNumber(item.spent) }}</span>
+                        </div>
+
+                        <div class="alert-row editable">
+                          <span>Budget</span>
+                          <div class="budget-edit">
+                            <span class="currency">$</span>
+                            <input
+                              type="number"
+                              class="budget-input"
+                              v-model.number="budgets[item.key]"
+                              min="0"
+                            />
+                          </div>
+                        </div>
+
+                        <div class="progress-bar">
+                          <div
+                            class="progress-fill"
+                            :class="barClass(item)"
+                            :style="{ width: progressWidth(item) }"
+                          ></div>
+                        </div>
+                        <div class="alert-status">
+                          {{ percentUsed(item) }}% - {{ statusText(item) }}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="alert-status">{{ percentUsed(cat) }}% used - {{ statusText(cat) }}</div>
-                  <button class="adjust-btn" @click="startEdit(cat)">Adjust Budget</button>
-                </template>
-                <template v-else>
-                  <div class="form-group">
-                    <label>Spent</label>
-                    <input type="number" v-model="cat.formSpent" placeholder="Enter spent">
-                  </div>
-                  <div class="form-group">
-                    <label>Budget</label>
-                    <input type="number" v-model="cat.formBudget" placeholder="Enter budget">
-                  </div>
-                  <div class="adjust-buttons">
-                    <button class="adjust-btn primary" @click="applyEdit(cat)">Calculate</button>
-                    <button class="adjust-btn secondary" @click="cancelEdit(cat)">Cancel</button>
-                  </div>
-                </template>
-              </div>
+                </div> <!-- /pane -->
+              </div> <!-- /flashcard-body -->
             </div>
           </div>
         </div>
 
-        <!-- Savings Goal Calculator Section -->
+        <!-- 储蓄目标计算器（保留原风格） -->
         <div class="savings-calculator-section">
           <div class="calc-header">
             <h2>Savings Goal Calculator</h2>
@@ -156,17 +140,17 @@
           </div>
           <div class="calculator-card">
             <div class="calculator-container">
+              <!-- 左：表单 -->
               <div class="calculator-left">
                 <div class="form-section">
                   <div class="form-group">
                     <label>Savings Goal</label>
-                    <input type="text" v-model="savingsGoal" placeholder="Enter your target amount">
+                    <input type="text" v-model="savingsGoal" placeholder="Enter your target amount" />
                   </div>
-                  
                   <div class="form-group">
                     <label>Timeline</label>
                     <div class="timeline-group">
-                      <input type="number" v-model="duration" placeholder="Duration">
+                      <input type="number" v-model="duration" placeholder="Duration" />
                       <select v-model="timeUnit">
                         <option value="weeks">Weeks</option>
                         <option value="months">Months</option>
@@ -174,21 +158,19 @@
                       </select>
                     </div>
                   </div>
-                  
                   <div class="form-group">
                     <label>Initial Deposit (Optional)</label>
-                    <input type="text" v-model="initialDeposit" placeholder="Amount you already have saved">
+                    <input type="text" v-model="initialDeposit" placeholder="Amount already saved" />
                   </div>
-                  
                   <div class="form-group">
                     <label>Interest Rate (Annual %)</label>
-                    <input type="text" v-model="interestRate" placeholder="Expected annual interest rate">
+                    <input type="text" v-model="interestRate" placeholder="e.g. 5" />
                   </div>
-                  
                   <button class="calculate-savings-btn" @click="calculateSavings">Calculate Savings Plan</button>
                 </div>
               </div>
-              
+
+              <!-- 右：结果 + 折线图 -->
               <div class="calculator-right">
                 <div class="savings-plan-card">
                   <h3>Your Savings Plan</h3>
@@ -210,1267 +192,376 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="chart-section">
                   <h4>Progress Visualization</h4>
                   <div ref="savingsChartRef" class="savings-chart"></div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
+            </div><!-- /calculator-container -->
+          </div><!-- /calculator-card -->
+        </div><!-- /savings-calculator-section -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { onMounted, ref, watch, computed } from 'vue'
-import * as echarts from 'echarts'
+import { ref, onMounted, computed } from "vue";
+import * as echarts from "echarts";
 
 export default {
-  name: 'BudgetPlanner',
+  name: "BudgetPlanner",
   setup() {
-    const chartRef = ref(null)
-    let chart = null
-    
-    const income = ref({
-      salary: '',
-      investments: '',
-      other: ''
-    })
-    
+    /** ===== 左侧表单状态 ===== */
+    const income = ref({ salary: "5800", investments: "0", other: "0" });
     const expenses = ref({
-      housing: '',
-      transportation: '',
-      food: '',
-      entertainment: '',
-      healthcare: ''
-    })
-    
-    // Savings Goal Calculator data
-    const savingsChartRef = ref(null)
-    let savingsChart = null
-    
-    const savingsGoal = ref('10000')
-    const duration = ref('12')
-    const timeUnit = ref('months')
-    const initialDeposit = ref('1000')
-    const interestRate = ref('5')
-    
-    const monthlyAmount = ref('750')
-    const weeklyAmount = ref('173')
-    const amountToSave = ref('9000')
-    
+      housing: "1800",
+      transportation: "650",
+      food: "400",
+      entertainment: "200",
+      healthcare: "150",
+    });
+
+    /** ===== 右侧 Flashcards 索引（0: 图表 / 1: Alerts） ===== */
+    const activeIndex = ref(0);
+    const nextCard = () => (activeIndex.value = (activeIndex.value + 1) % 2);
+    const prevCard = () => (activeIndex.value = (activeIndex.value + 1) % 2);
+
+    /** ===== 饼图（Expense Distribution） ===== */
+    const chartRef = ref(null);
+    let chart = null;
+
     const initChart = () => {
-      console.log('initChart called', chartRef.value)
-      if (chartRef.value && !chart) {
-        console.log('Initializing chart...')
-        // 添加小延迟确保DOM完全渲染
-        setTimeout(() => {
-          chart = echarts.init(chartRef.value)
-          console.log('Chart initialized:', chart)
-          updateChart()
-          window.addEventListener('resize', () => chart.resize())
-        }, 100)
-      }
-    }
-    
+      if (!chartRef.value) return;
+      chart = echarts.init(chartRef.value);
+      updateChart();
+      window.addEventListener("resize", () => chart && chart.resize());
+    };
+
     const updateChart = () => {
-      if (!chart) return
-      
+      if (!chart) return;
       const data = [
-        { value: parseFloat(expenses.value.housing) || 0, name: 'Housing', itemStyle: { color: '#4285F4' } },
-        { value: parseFloat(expenses.value.transportation) || 0, name: 'Transportation', itemStyle: { color: '#34A853' } },
-        { value: parseFloat(expenses.value.food) || 0, name: 'Food & Dining', itemStyle: { color: '#FBBC05' } },
-        { value: parseFloat(expenses.value.entertainment) || 0, name: 'Entertainment', itemStyle: { color: '#EA4335' } },
-        { value: parseFloat(expenses.value.healthcare) || 0, name: 'Healthcare', itemStyle: { color: '#9C27B0' } }
-      ].filter(item => item.value > 0)
-      
-      const option = {
-        title: {
-          text: 'Expense Distribution',
-          left: 'center',
-          top: 15,
-          textStyle: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: '#333'
-          }
-        },
-        tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b}: ${c} ({d}%)'
-        },
-        legend: {
-          orient: 'horizontal',
-          bottom: 10,
-          left: 'center',
-          itemWidth: 14,
-          itemHeight: 14,
-          textStyle: {
-            fontSize: 12
-          }
-        },
+        { value: parseFloat(expenses.value.housing) || 0, name: "Housing" },
+        { value: parseFloat(expenses.value.transportation) || 0, name: "Transportation" },
+        { value: parseFloat(expenses.value.food) || 0, name: "Food & Dining" },
+        { value: parseFloat(expenses.value.entertainment) || 0, name: "Entertainment" },
+        { value: parseFloat(expenses.value.healthcare) || 0, name: "Healthcare" },
+      ];
+      chart.setOption({
+        tooltip: { trigger: "item", formatter: "{b}<br/>${c} ({d}%)" },
+        legend: { bottom: 8 },
         series: [
-            {
-              name: 'Expenses',
-              type: 'pie',
-              radius: ['40%', '75%'],
-              center: ['50%', '55%'],
-              avoidLabelOverlap: true,
-            itemStyle: {
-              borderRadius: 8,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
-            label: {
-              show: true,
-              position: 'outside',
-              fontSize: 11,
-              formatter: '{b}\n${c}'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 13,
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: true,
-              length: 15,
-              length2: 10
-            },
-            data: data.length > 0 ? data : [{ value: 1, name: 'No Data', itemStyle: { color: '#e2e8f0' } }]
-          }
-        ]
-      }
-      
-      chart.setOption(option)
-    }
-    
-    // 初始化为0，只有点击Calculate Budget后才计算
-    const totalIncome = ref(0)
-    const totalExpenses = ref(0)
-    const balance = ref(0)
+          {
+            name: "Expenses",
+            type: "pie",
+            radius: ["40%", "70%"],
+            center: ["50%", "50%"],
+            itemStyle: { borderRadius: 8, borderColor: "#fff", borderWidth: 2 },
+            label: { formatter: "{b}\n${c}" },
+            data: data.length ? data : [{ value: 1, name: "No Data" }],
+          },
+        ],
+      });
+    };
 
-    // Overspending Alerts - dynamic categories with edit/apply flow
-    const categories = ref([
-      { key: 'housing', name: 'Housing', spent: 1800, budget: 2000, isEditing: false, formSpent: '', formBudget: '' },
-      { key: 'transportation', name: 'Transportation', spent: 650, budget: 500, isEditing: false, formSpent: '', formBudget: '' },
-      { key: 'food', name: 'Food & Dining', spent: 400, budget: 600, isEditing: false, formSpent: '', formBudget: '' },
-      { key: 'entertainment', name: 'Entertainment', spent: 200, budget: 300, isEditing: false, formSpent: '', formBudget: '' },
-      { key: 'healthcare', name: 'Healthcare', spent: 150, budget: 200, isEditing: false, formSpent: '', formBudget: '' },
-      { key: 'shopping', name: 'Shopping', spent: 450, budget: 400, isEditing: false, formSpent: '', formBudget: '' }
-    ])
-
-    const percentUsed = (cat) => {
-      const spent = parseFloat(cat.spent) || 0
-      const budget = parseFloat(cat.budget) || 0
-      if (budget <= 0) return spent > 0 ? 100 : 0
-      return Math.round((spent / budget) * 100)
-    }
-
-    const statusClass = (cat) => {
-      const p = percentUsed(cat)
-      if (p > 100) return 'exceeded'
-      if (p >= 90) return 'warning'
-      return 'good'
-    }
-
-    const barClass = (cat) => {
-      const cls = statusClass(cat)
-      if (cls === 'exceeded') return 'exceeded'
-      if (cls === 'warning') return 'warning'
-      return 'good'
-    }
-
-    const progressWidth = (cat) => {
-      const p = percentUsed(cat)
-      return Math.min(p, 100) + '%'
-    }
-
-    const statusText = (cat) => {
-      const p = percentUsed(cat)
-      if (p > 100) return 'Exceeded'
-      if (p >= 90) return 'Warning'
-      return 'Good'
-    }
-
-    const statusIcon = (cat) => {
-      const p = percentUsed(cat)
-      if (p > 100) return '🚫'
-      if (p >= 90) return '⚠️'
-      return '✅'
-    }
-
-    const startEdit = (cat) => {
-      cat.formSpent = cat.spent.toString()
-      cat.formBudget = cat.budget.toString()
-      cat.isEditing = true
-    }
-
-    const cancelEdit = (cat) => {
-      cat.formSpent = ''
-      cat.formBudget = ''
-      cat.isEditing = false
-    }
-
-    const applyEdit = (cat) => {
-      const s = parseFloat(cat.formSpent) || 0
-      const b = parseFloat(cat.formBudget) || 0
-      cat.spent = s
-      cat.budget = b
-      cat.formSpent = ''
-      cat.formBudget = ''
-      cat.isEditing = false
-      console.log(`Updated ${cat.name}: spent=${s}, budget=${b}`)
-    }
-    
-
-    
-    // Set default values
-    income.value.salary = '5800'
-    income.value.investments = '0'
-    income.value.other = '0'
-    expenses.value.housing = '1800'
-    expenses.value.transportation = '650'
-    expenses.value.food = '400'
-    expenses.value.entertainment = '200'
-    expenses.value.healthcare = '150'
-    
-    // 初始计算一次，显示默认值
-    const salaryVal = parseFloat(income.value.salary) || 0
-    const investmentsVal = parseFloat(income.value.investments) || 0
-    const otherVal = parseFloat(income.value.other) || 0
-    totalIncome.value = salaryVal + investmentsVal + otherVal
-    
-    const housingVal = parseFloat(expenses.value.housing) || 0
-    const transportationVal = parseFloat(expenses.value.transportation) || 0
-    const foodVal = parseFloat(expenses.value.food) || 0
-    const entertainmentVal = parseFloat(expenses.value.entertainment) || 0
-    const healthcareVal = parseFloat(expenses.value.healthcare) || 0
-    totalExpenses.value = housingVal + transportationVal + foodVal + entertainmentVal + healthcareVal
-    
-    balance.value = totalIncome.value - totalExpenses.value
-    
     const calculateBudget = () => {
-      // Calculate totals
-      const salaryVal = parseFloat(income.value.salary) || 0
-      const investmentsVal = parseFloat(income.value.investments) || 0
-      const otherVal = parseFloat(income.value.other) || 0
-      totalIncome.value = salaryVal + investmentsVal + otherVal
-      
-      const housingVal = parseFloat(expenses.value.housing) || 0
-      const transportationVal = parseFloat(expenses.value.transportation) || 0
-      const foodVal = parseFloat(expenses.value.food) || 0
-      const entertainmentVal = parseFloat(expenses.value.entertainment) || 0
-      const healthcareVal = parseFloat(expenses.value.healthcare) || 0
-      totalExpenses.value = housingVal + transportationVal + foodVal + entertainmentVal + healthcareVal
-      
-      balance.value = totalIncome.value - totalExpenses.value
-      
-      console.log('Budget calculated!')
-      updateChart()
-    }
-    
-    const calculateSavings = () => {
-      const goal = parseFloat(savingsGoal.value) || 0
-      const initial = parseFloat(initialDeposit.value) || 0
-      const rate = parseFloat(interestRate.value) || 0
-      const time = parseFloat(duration.value) || 1
-      
-      const remaining = goal - initial
-      amountToSave.value = remaining.toString()
-      
-      if (timeUnit.value === 'months') {
-        monthlyAmount.value = Math.round(remaining / time).toString()
-        weeklyAmount.value = Math.round(remaining / (time * 4.33)).toString()
-      } else if (timeUnit.value === 'weeks') {
-        weeklyAmount.value = Math.round(remaining / time).toString()
-        monthlyAmount.value = Math.round(remaining / (time / 4.33)).toString()
-      } else if (timeUnit.value === 'years') {
-        monthlyAmount.value = Math.round(remaining / (time * 12)).toString()
-        weeklyAmount.value = Math.round(remaining / (time * 52)).toString()
-      }
-      
-      updateSavingsChart()
-    }
-    
-    const formatNumber = (value) => {
-      const num = parseFloat(value) || 0
-      return num.toLocaleString()
-    }
-    
+      // 计算后刷新图
+      if (chart) updateChart();
+    };
+
+    /** ===== Alerts：Spent 来自左侧 expenses；Budget 可编辑 ===== */
+    const categoryMeta = [
+      { key: "housing",        name: "Housing" },
+      { key: "transportation", name: "Transportation" },
+      { key: "food",           name: "Food & Dining" },
+      { key: "entertainment",  name: "Entertainment" },
+      { key: "healthcare",     name: "Healthcare" },
+    ];
+
+    // 可编辑预算
+    const budgets = ref({
+      housing: 2000,
+      transportation: 500,
+      food: 600,
+      entertainment: 300,
+      healthcare: 200,
+    });
+
+    // 合成用于展示的卡片数据
+    const alertCards = computed(() => {
+      return categoryMeta.map((m) => {
+        const spent  = parseFloat(expenses.value[m.key]) || 0;
+        const budget = parseFloat(budgets.value[m.key]) || 0;
+        return { ...m, spent, budget };
+      });
+    });
+
+    const percentUsed = (item) => {
+      const spent = item.spent || 0;
+      const budget = item.budget || 0;
+      if (budget <= 0) return spent > 0 ? 100 : 0;
+      return Math.round((spent / budget) * 100);
+    };
+    const statusClass = (item) => {
+      const p = percentUsed(item);
+      if (p > 100) return "exceeded";
+      if (p >= 90) return "warning";
+      return "good";
+    };
+    const barClass = (item) => statusClass(item);
+    const progressWidth = (item) => Math.min(percentUsed(item), 100) + "%";
+    const statusText = (item) => {
+      const p = percentUsed(item);
+      if (p > 100) return "Exceeded";
+      if (p >= 90) return "Warning";
+      return "Good";
+    };
+    const statusIcon = (item) => {
+      const p = percentUsed(item);
+      return p > 100 ? "🚫" : p >= 90 ? "⚠️" : "✅";
+    };
+    const formatNumber = (v) => (parseFloat(v) || 0).toLocaleString();
+
+    /** ===== 储蓄目标计算器 ===== */
+    const savingsChartRef = ref(null);
+    let savingsChart = null;
+
+    const savingsGoal = ref("10000");
+    const duration = ref("12");
+    const timeUnit = ref("months");
+    const initialDeposit = ref("1000");
+    const interestRate = ref("5"); // 未参与计算，仅展示
+    const monthlyAmount = ref("750");
+    const weeklyAmount = ref("173");
+
     const initSavingsChart = () => {
-      if (savingsChartRef.value && !savingsChart) {
-        setTimeout(() => {
-          console.log('Initializing savings chart...', savingsChartRef.value)
-          savingsChart = echarts.init(savingsChartRef.value)
-          console.log('Savings chart initialized:', savingsChart)
-          updateSavingsChart()
-          window.addEventListener('resize', () => savingsChart.resize())
-        }, 200) // 增加延迟时间
-      }
-    }
-    
+      if (!savingsChartRef.value) return;
+      savingsChart = echarts.init(savingsChartRef.value);
+      updateSavingsChart();
+      window.addEventListener("resize", () => savingsChart && savingsChart.resize());
+    };
+
     const updateSavingsChart = () => {
-      if (!savingsChart) {
-        console.log('Savings chart not initialized yet')
-        return
-      }
-      
-      const months = 12
-      const monthlyTarget = parseFloat(monthlyAmount.value) || 750
-      const initial = parseFloat(initialDeposit.value) || 1000
-      
-      const data = []
-      for (let i = 0; i <= months; i++) {
-        data.push(initial + (monthlyTarget * i))
-      }
-      
-      console.log('Chart data:', data)
-      
-      const option = {
-        grid: {
-          left: '15%',
-          right: '10%',
-          top: '10%',
-          bottom: '20%'
-        },
+      if (!savingsChart) return;
+      const months = 12;
+      const monthlyTarget = parseFloat(monthlyAmount.value) || 750;
+      const initial = parseFloat(initialDeposit.value) || 1000;
+      const data = Array.from({ length: months + 1 }, (_, i) => initial + monthlyTarget * i);
+
+      savingsChart.setOption({
+        grid: { left: "12%", right: "8%", top: "10%", bottom: "16%" },
         xAxis: {
-          type: 'category',
-          data: Array.from({length: 13}, (_, i) => i.toString()),
-          axisLine: { show: false },
+          type: "category",
+          data: Array.from({ length: months + 1 }, (_, i) => i.toString()),
           axisTick: { show: false },
-          axisLabel: {
-            color: '#666',
-            fontSize: 10
-          }
+          axisLine: { show: false },
+          axisLabel: { color: "#666" },
         },
         yAxis: {
-          type: 'value',
-          axisLine: { show: false },
+          type: "value",
+          splitLine: { lineStyle: { color: "#f0f0f0" } },
           axisTick: { show: false },
-          splitLine: {
-            lineStyle: {
-              color: '#f0f0f0',
-              type: 'solid'
-            }
-          },
-          axisLabel: {
-            color: '#666',
-            fontSize: 10,
-            formatter: function(value) {
-              return '$' + (value/1000).toFixed(0) + 'k'
-            }
-          }
+          axisLine: { show: false },
+          axisLabel: { color: "#666", formatter: (val) => "$" + (val / 1000).toFixed(0) + "k" },
         },
-        series: [{
-          data: data,
-          type: 'line',
-          smooth: true,
-          lineStyle: {
-            color: '#28a745',
-            width: 3
+        series: [
+          {
+            data,
+            type: "line",
+            smooth: true,
+            lineStyle: { color: "#16a34a", width: 3 },
+            itemStyle: { color: "#16a34a" },
+            symbol: "circle",
+            symbolSize: 6,
+            areaStyle: {
+              color: {
+                type: "linear",
+                x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: "rgba(22,163,74,.28)" },
+                  { offset: 1, color: "rgba(22,163,74,.05)" },
+                ],
+              },
+            },
           },
-          itemStyle: {
-            color: '#28a745'
-          },
-          symbol: 'circle',
-          symbolSize: 6,
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [{
-                offset: 0, color: 'rgba(40, 167, 69, 0.3)'
-              }, {
-                offset: 1, color: 'rgba(40, 167, 69, 0.05)'
-              }]
-            }
-          }
-        }]
-      }
-      
-      savingsChart.setOption(option, true) // 强制重新渲染
-      console.log('Chart option set')
-    }
-    
+        ],
+      });
+    };
+
+    const calculateSavings = () => {
+      const goal = parseFloat(savingsGoal.value) || 0;
+      const initial = parseFloat(initialDeposit.value) || 0;
+      const remaining = Math.max(goal - initial, 0);
+
+      let months = parseFloat(duration.value) || 1;
+      if (timeUnit.value === "weeks") months = months / 4.33;
+      if (timeUnit.value === "years") months = months * 12;
+
+      const perMonth = remaining / months;
+      const perWeek = remaining / (months * 4.33);
+
+      monthlyAmount.value = Math.round(perMonth).toString();
+      weeklyAmount.value = Math.round(perWeek).toString();
+
+      updateSavingsChart();
+    };
+
+    /** ===== 挂载 ===== */
     onMounted(() => {
-      initChart()
-      initSavingsChart()
-    })
-    
+      // 初始化默认值展示
+      initChart();
+      calculateBudget();
+
+      initSavingsChart();
+      calculateSavings();
+    });
+
     return {
+      // 表单
+      income, expenses, calculateBudget,
+      // flashcards
+      activeIndex, nextCard, prevCard,
+      // 饼图
       chartRef,
-      savingsChartRef,
-      income,
-      expenses,
-      totalIncome,
-      totalExpenses,
-      balance,
-      categories,
-      calculateBudget,
-      savingsGoal,
-      duration,
-      timeUnit,
-      initialDeposit,
-      interestRate,
-      monthlyAmount,
-      weeklyAmount,
-      amountToSave,
-      calculateSavings,
-      formatNumber,
-      percentUsed,
-      statusClass,
-      statusText,
-      barClass,
-      progressWidth,
-      statusIcon,
-      startEdit,
-      cancelEdit,
-      applyEdit
-    }
-  }
-}
+      // alerts（联动 + 可编辑预算）
+      budgets, alertCards, percentUsed, statusClass, barClass, progressWidth, statusText, statusIcon, formatNumber,
+      // 储蓄计算器
+      savingsGoal, duration, timeUnit, initialDeposit, interestRate, monthlyAmount, weeklyAmount,
+      savingsChartRef, calculateSavings,
+    };
+  },
+};
 </script>
 
 <style scoped>
-.budget-planner {
-  min-height: 100vh;
-  background: #f8fafc;
-}
-
-.header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 0;
-}
-
-.header-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logo-icon {
-  font-size: 1.5rem;
-}
-
-.logo-text {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #4F46E5;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.nav-link {
-  color: #64748b;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.nav-link:hover {
-  color: #334155;
-}
-
-.get-started-btn {
-  background: #4F46E5;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.get-started-btn:hover {
-  background: #4338CA;
-}
-
-.main-content {
-  padding: 3rem 0;
-}
-
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-.title-section {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.title-section h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-.title-section p {
-  font-size: 1.125rem;
-  color: #64748b;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.budget-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  margin-bottom: 4rem;
-}
-
-.form-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.income-section,
-.expenses-section {
-  margin-bottom: 2rem;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.section-icon {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.section-icon.green {
-  background: #10B981;
-}
-
-.section-icon.red {
-  background: #EF4444;
-}
-
-.section-header h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: white;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-.calculate-btn {
-  width: 100%;
-  background: #4F46E5;
-  color: white;
-  border: none;
-  padding: 0.875rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.calculate-btn:hover {
-  background: #4338CA;
-}
-
-.summary-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.budget-summary {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.budget-summary h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-.summary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.summary-item:last-child {
-  border-bottom: none;
-}
-
-.summary-item.balance {
-  font-weight: 600;
-  font-size: 1.125rem;
-}
-
-.amount.green {
-  color: #10B981;
-}
-
-.amount.red {
-  color: #EF4444;
-}
-
-.chart-section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.chart-section h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-.chart-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.pie-chart {
-  position: relative;
-}
-
-.pie-chart circle {
-  fill: none;
-  stroke-width: 40;
-}
-
-.chart-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.alerts-section {
-  margin-bottom: 3rem;
-}
-
-.alerts-section h2 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1e293b;
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.alerts-section p {
-  font-size: 1.125rem;
-  color: #64748b;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.alerts-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-.alert-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid;
-}
-
-.alert-card.warning {
-  border-left-color: #F59E0B;
-}
-
-.alert-card.exceeded {
-  border-left-color: #EF4444;
-}
-
-.alert-card.good {
-  border-left-color: #10B981;
-}
-
-.alert-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.alert-header h4 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.alert-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.alert-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  color: #64748b;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 8px;
-  background: #f1f5f9;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 4px;
-}
-
-.progress-fill.warning {
-  background: #F59E0B;
-}
-
-.progress-fill.exceeded {
-  background: #EF4444;
-}
-
-.progress-fill.good {
-  background: #10B981;
-}
-
-.alert-status {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.alert-card.warning .alert-status {
-  color: #F59E0B;
-}
-
-.alert-card.exceeded .alert-status {
-  color: #EF4444;
-}
-
-.alert-card.good .alert-status {
-  color: #10B981;
-}
-
-.adjust-btn {
-  background: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  flex: 1;
-}
-
-.adjust-btn:hover {
-  background: #f1f5f9;
-}
-
-.adjust-btn.primary {
-  background: #4F46E5;
-  color: white;
-  border-color: #4F46E5;
-}
-
-.adjust-btn.primary:hover {
-  background: #4338CA;
-}
-
-.adjust-btn.secondary {
-  background: #ef4444;
-  color: white;
-  border-color: #ef4444;
-}
-
-.adjust-btn.secondary:hover {
-  background: #dc2626;
-}
-
-.adjust-buttons {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-/* Fix form inputs in alert cards */
-.alert-card .form-group {
-  margin-bottom: 0.75rem;
-}
-
-.alert-card .form-group input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
-}
-
-.alert-card .form-group label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.25rem;
-}
-
-.chart-center-text {
-  font-size: 14px;
-  fill: #64748b;
-  font-weight: 500;
-}
-
-.chart-container {
-  width: 100%;
-  height: 500px;
-  min-height: 500px;
-}
-
-@media (max-width: 1024px) {
-  .budget-section {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-  
-  .alerts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Footer Styles */
-.footer {
-  background: #1f2937;
-  color: white;
-  padding: 2rem 0;
-  margin-top: 4rem;
-}
-
-.footer-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-left {
-  display: flex;
-  align-items: center;
-}
-
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.footer-icon {
-  font-size: 1.5rem;
-}
-
-.footer-text {
-  font-size: 0.9rem;
-  color: #d1d5db;
-}
-
-.footer-right {
-  display: flex;
-  align-items: center;
-}
-
-.payment-icons {
-  display: flex;
-  gap: 1rem;
-}
-
-.payment-icon {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: white;
-}
-
-.payment-icon.visa {
-  background: #1a1f71;
-}
-
-.payment-icon.mastercard {
-  background: #eb001b;
-}
-
-.payment-icon.paypal {
-  background: #003087;
-}
-
-/* Savings Goal Calculator Section */
-.savings-calculator-section {
-  margin-top: 3rem;
-  background: transparent;
-}
-
-/* Centered header above card */
-.calc-header {
-  text-align: center;
-  margin-bottom: 0.75rem;
-}
-.calc-header h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #111827;
-}
-.calc-header p {
-  margin-top: 0.25rem;
-  color: #6b7280;
-  font-size: 0.92rem;
-}
-
-/* White card wrapper that contains the two columns */
-.calculator-card {
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
-  padding: 0.75rem 0.75rem 1.25rem;
-}
-
-/* Layout */
-.calculator-container {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  min-height: 560px;
-}
-
-.calculator-left {
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-right: 1px solid #e9ecef;
-}
-
-/* 调整储蓄计算器布局为左右各占一半 */
-.savings-calculator-section .calculator-container { grid-template-columns: 1fr 1fr; }
-.calculator-left {
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-right: 1px solid #e9ecef;
-}
-
-/* Make left column blend with card; remove divider */
-.savings-calculator-section .calculator-left { background: transparent; border-right: 0; }
-/* Inner form becomes subtle white card (no heavy shadow) */
-.savings-calculator-section .calculator-left .form-section { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: none; padding: 1rem; }
-/* Larger green amount like mock */
-.plan-amount .amount { font-size: 2rem; font-weight: 800; }
-.timeline-group {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.5rem;
-}
-.timeline-group input,
-.timeline-group select {
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+.budget-planner { min-height: 100vh; background: #f8fafc; }
+.main-content { padding: 3rem 0; }
+.container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+
+/* Grid: 左侧表单 + 右侧 Flashcards */
+.budget-section { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+
+/* 左侧表单卡片 */
+.form-section { background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.income-section, .expenses-section { margin-bottom: 2rem; }
+
+.section-header { display: flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.section-icon { width: 12px; height: 12px; border-radius: 50%; }
+.section-icon.green { background: #10B981; }
+.section-icon.red { background: #EF4444; }
+.section-header h3 { font-size: 1.1rem; font-weight: 700; color: #111827; margin: 0; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: .875rem; font-weight: 500; color: #374151; margin-bottom: .5rem; }
+.form-group input { width: 100%; padding: .75rem; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: .9rem; }
+.form-group input:focus { outline: none; border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+
+.calculate-btn { width: 100%; background: #4F46E5; color: #fff; border: 0; padding: .9rem; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.calculate-btn:hover { background: #4338CA; }
+
+/* 右侧 Flashcard 容器 */
+.summary-section { display: flex; flex-direction: column; gap: 1rem; }
+.flashcard { background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.06); padding: 1rem; }
+.flashcard-header { display: flex; justify-content: space-between; align-items: center; padding: .25rem .25rem .75rem; border-bottom: 1px solid #f1f5f9; margin-bottom: .75rem; }
+.flashcard-header h3 { font-size: 1.05rem; font-weight: 800; color: #111827; margin: 0; }
+.nav { display: inline-flex; gap: .5rem; }
+.nav-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid #e5e7eb; background: #fff; font-size: 18px; line-height: 1; cursor: pointer; }
+.nav-btn:hover { background: #f8fafc; }
+
+/* Flashcard 内容（v-show） */
+.flashcard-body { position: relative; min-height: 380px; }
+.flashcard-body .pane { position: absolute; inset: 0; transition: opacity .25s ease; }
+.flashcard-body .pane[style*="display: none"] { opacity: 0; pointer-events: none; }
+
+/* 饼图卡片 */
+.chart-section { background: #fff; padding: .25rem; border-radius: 12px; }
+.summary-section .chart-container { height: 380px; min-height: 380px; }
+
+/* Alerts 紧凑栅格 */
+.alerts-intro .muted { color: #64748b; font-size: .9rem; margin: .25rem 0 .75rem; }
+.alerts-grid.compact { display: grid; grid-template-columns: repeat(2,1fr); gap: .75rem; }
+.alert-card { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); border-left: 4px solid; }
+.alert-card.warning  { border-left-color: #F59E0B; }
+.alert-card.exceeded { border-left-color: #EF4444; }
+.alert-card.good     { border-left-color: #10B981; }
+
+.alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+.alert-header h4 { font-size: 1rem; font-weight: 700; color: #111827; margin: 0; }
+.alert-content { display: flex; flex-direction: column; gap: .6rem; }
+.alert-row { display: flex; justify-content: space-between; font-size: .875rem; color: #64748b; }
+
+.progress-bar { width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; }
+.progress-fill.warning  { background: #F59E0B; }
+.progress-fill.exceeded { background: #EF4444; }
+.progress-fill.good     { background: #10B981; }
+
+.alert-status { font-size: .85rem; font-weight: 600; }
+.alert-card.warning  .alert-status { color: #F59E0B; }
+.alert-card.exceeded .alert-status { color: #EF4444; }
+.alert-card.good     .alert-status { color: #10B981; }
+
+/* 可编辑预算输入样式 */
+.alert-row.editable { align-items: center; }
+.budget-edit { display: inline-flex; align-items: center; gap: 6px; }
+.budget-edit .currency { color: #6b7280; font-size: 0.9rem; }
+.budget-input {
+  width: 110px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.9rem;
   background: #fff;
 }
+.budget-input:focus {
+  outline: none;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+}
+
+/* ===== Savings Goal Calculator ===== */
+.savings-calculator-section { margin-top: 3rem; }
+.calc-header { text-align: center; margin-bottom: .75rem; }
+.calc-header h2 { font-size: 1.5rem; font-weight: 800; color: #111827; }
+.calc-header p  { margin-top: .25rem; color: #6b7280; font-size: .92rem; }
+
+.calculator-card { background: #fff; border-radius: 14px; box-shadow: 0 12px 24px rgba(0,0,0,.08); padding: .75rem .75rem 1.25rem; }
+.calculator-container { display: grid; grid-template-columns: 1fr 1fr; min-height: 560px; }
+
+.calculator-left { padding: 1.5rem; }
+.savings-calculator-section .calculator-left .form-section { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; box-shadow: none; padding: 1rem; }
+
+.timeline-group { display: grid; grid-template-columns: 1fr auto; gap: .5rem; }
+.timeline-group input, .timeline-group select { padding: .75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: .9rem; background: #fff; }
 .timeline-group select { min-width: 100px; }
 
-/* Right plan card styles */
-.savings-plan-card {
-  background: linear-gradient(180deg, #effaf3 0%, #f3fbf6 100%);
-  border-radius: 10px;
-  padding: 1rem;
-}
-.savings-plan-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-}
+.calculate-savings-btn { width: 100%; background: #16a34a; color: #fff; border: 0; padding: .9rem; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: .75rem; }
+.calculate-savings-btn:hover { background: #15803d; }
 
-.plan-box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 1rem;
-}
+.calculator-right { padding: 1rem; }
+.savings-plan-card { background: linear-gradient(180deg, #effaf3 0%, #f3fbf6 100%); border-radius: 10px; padding: 1rem; }
+.savings-plan-card h3 { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: .75rem; }
+.plan-box { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem; }
 .plan-amount .currency { color: #16a34a; font-weight: 700; }
 .plan-amount .amount { color: #16a34a; font-size: 1.75rem; font-weight: 800; }
-.plan-description { margin-top: 0.25rem; color: #6b7280; font-size: 0.85rem; }
-
-.stat-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
-.stat-pill { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; text-align: center; }
+.plan-description { margin-top: .25rem; color: #6b7280; font-size: .85rem; }
+.stat-pills { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .75rem; }
+.stat-pill { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: .75rem; text-align: center; }
 .pill-amount { font-weight: 800; }
 .pill-amount.blue { color: #2563eb; }
 .pill-amount.purple { color: #7c3aed; }
-.pill-label { font-size: 0.75rem; color: #6b7280; }
+.pill-label { font-size: .75rem; color: #6b7280; }
 
-/* Chart and breakdown keep previous spacing */
-.savings-chart { 
-  width: 100%; 
-  height: 200px; 
-  background: #f8f9fa;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+.chart-section h4 { font-size: .95rem; font-weight: 700; color: #1f2937; margin-bottom: .75rem; }
+.savings-chart { width: 100%; height: 200px; background: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 8px; }
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .budget-section { grid-template-columns: 1fr; gap: 2rem; }
+  .alerts-grid.compact { grid-template-columns: 1fr; }
 }
-
-/* 修复输入框布局问题 */
-.savings-calculator-section .form-group input {
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 0.75rem;
-  font-size: 0.9rem;
-}
-
-.savings-calculator-section .form-group input::placeholder {
-  color: #9ca3af;
-}
-
-.timeline-group {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.5rem;
-}
-
-.timeline-group input {
-  min-width: 0; /* 防止输入框溢出 */
-}
-.timeline-group select { min-width: 100px; }
-
-/* Right plan card styles */
-.savings-plan-card {
-  background: linear-gradient(180deg, #effaf3 0%, #f3fbf6 100%);
-  border-radius: 10px;
-  padding: 1rem;
-}
-.savings-plan-card h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-}
-
-.plan-box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 1rem;
-}
-.plan-amount .currency { color: #16a34a; font-weight: 700; }
-.plan-amount .amount { color: #16a34a; font-size: 1.75rem; font-weight: 800; }
-.plan-description { margin-top: 0.25rem; color: #6b7280; font-size: 0.85rem; }
-
-.stat-pills { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
-.stat-pill { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.75rem; text-align: center; }
-.pill-amount { font-weight: 800; }
-.pill-amount.blue { color: #2563eb; }
-.pill-amount.purple { color: #7c3aed; }
-.pill-label { font-size: 0.75rem; color: #6b7280; }
-
-/* Chart section title for h4 */
-.chart-section h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-}
-
-/* Calculate Savings Plan 按钮样式 */
-.calculate-savings-btn {
-  width: 100%;
-  background: #16a34a;
-  color: white;
-  border: none;
-  padding: 0.875rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-
-.calculate-savings-btn:hover {
-  background: #15803d;
-}
-
-/* Goal Breakdown 样式调整 */
-.goal-breakdown {
-  margin-top: 1rem;
-}
-
-.goal-breakdown h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 0.75rem;
-}
-
-.breakdown-table {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 1rem;
-}
-
-.breakdown-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.breakdown-row:last-child {
-  border-bottom: none;
-}
-
-.breakdown-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.breakdown-value {
-  font-size: 0.875rem;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-/* Responsive tweak for mobile (keep) */
 @media (max-width: 768px) {
-  .calculator-right { padding: 0.75rem; }
   .calculator-container { grid-template-columns: 1fr; }
-  .calculator-left { border-right: none; border-bottom: 1px solid #e9ecef; }
-}
-
-@media (max-width: 768px) {
-  .alerts-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .nav-links {
-    gap: 1rem;
-  }
-  
-
-  
-  .footer-content {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-  
-  .payment-icons {
-    justify-content: center;
-  }
-  
-  .calculator-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .calculator-left {
-    border-right: none;
-    border-bottom: 1px solid #e9ecef;
-  }
-  
-  .breakdown-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .savings-chart {
-    height: 150px;
-  }
 }
 </style>
