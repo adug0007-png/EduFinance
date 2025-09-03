@@ -335,9 +335,9 @@ export default {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 40px;
-    align-items: start;
+    align-items: stretch;
   }
 
   .form-section {
