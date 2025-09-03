@@ -9,7 +9,7 @@
             <h2 class="card-title">Salary Calculator</h2>
             <button class="refresh-btn"></button>
           </div>
-          <p class="card-subtitle">Flip the card to see your take-home pay</p>
+          <p class="card-subtitle">Click the to see your take-home pay</p>
 
           <div class="form-group">
             <label class="form-label">Annual Gross Salary</label>
@@ -91,7 +91,7 @@
       <div class="right-column">
         <div class="flashcard-section">
           <div class="section-header">
-            <h2 class="section-title">Financial Terms Flashcards</h2>
+            <h2 class="section-title">Financial Terms Cards</h2>
             <div class="nav-arrows">
               <button class="arrow-btn" @click="prevCard">◀</button>
               <button class="arrow-btn" @click="nextCard">▶</button>
@@ -117,15 +117,29 @@
 
             <!-- Navigation hints -->
             <div class="navigation-hints">
-              <div class="hint-item">
-                <span class="hint-icon">◀</span>
-                <span class="hint-text">Previous term</span>
-              </div>
-              <div class="hint-item">
-                <span class="hint-icon">▶</span>
-                <span class="hint-text">Next term</span>
-              </div>
-            </div>
+        <button
+          type="button"
+          class="hint-link"
+          @click="prevCard"
+          :disabled="atStart"
+          aria-label="Previous term"
+        >
+          <span class="hint-icon">◀</span>
+          <span class="hint-text">Previous term</span>
+        </button>
+
+        <button
+          type="button"
+          class="hint-link"
+          @click="nextCard"
+          :disabled="atEnd"
+          aria-label="Next term"
+        >
+          <span class="hint-text">Next term</span>
+          <span class="hint-icon">▶</span>
+        </button>
+      </div>
+
           </div>
 
           <!-- Key Super Facts -->
@@ -168,7 +182,7 @@
           </div>
 
           <!-- Expandable Sections -->
-          <div class="expandable-sections">
+          <!-- <div class="expandable-sections">
             <div class="expandable-item">
               <div class="expandable-header">
                 <span>Benefits of Super</span>
@@ -181,16 +195,16 @@
                 <span>▼</span>
               </div>
             </div>
-          </div>
+          </div> -->
 
-          <!-- Get Advice Section -->
+          <!-- Get Advice Section
           <div class="advice-section">
             <div class="advice-content">
               <p class="advice-text">Ready to optimize your super?</p>
               <p class="advice-subtext">Get personalized advice from our experts</p>
             </div>
             <button class="advice-btn">Get Advice</button>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -530,7 +544,15 @@ export default {
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 40px;
+  align-items: stretch;
 }
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+}
+
 
 /* Left Column - Calculator */
 .calculator-card {
@@ -540,6 +562,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   height: fit-content;
+  flex: 1 1 auto;
 }
 
 .card-header {
@@ -770,7 +793,8 @@ export default {
   padding: 24px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
-  height: fit-content;
+  
+
 }
 
 .section-header {
@@ -791,6 +815,33 @@ export default {
   display: flex;
   gap: 4px;
 }
+
+.navigation-hints {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+.hint-link {
+  background: transparent;
+  border: 0;
+  padding: 6px 0;
+  color: #6B7280;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.hint-link:hover:not(:disabled) { color: var(--primary-color, #4F46E5); }
+.hint-link:disabled { opacity: .45; cursor: not-allowed; }
+
+.arrow-btn:disabled { opacity: .45; cursor: not-allowed; }
+
 
 .arrow-btn {
   background: #f3f4f6;
@@ -1003,13 +1054,14 @@ export default {
 
 .facts-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
 .fact-item {
-  display: flex;
+  display: grid;
   align-items: flex-start;
+  grid-template-columns: 28px 1fr;
   gap: 12px;
   padding: 12px;
   background: #f9fafb;
@@ -1024,28 +1076,48 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  grid-column: 1;
+  align-self: start;
 }
 
 .fact-content {
-  flex: 1;
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: 1fr auto; /* text | value */
+  column-gap: 24px;
+  row-gap: 2px;
+  align-items: center;
 }
 
 .fact-label {
   font-size: 12px;
-  color: #6b7280;
+  color: black;
   margin-bottom: 2px;
+  grid-column: 1;
+  grid-row: 1;
+
 }
 
 .fact-value {
-  font-size: 18px;
+  grid-column: 2; 
+  grid-row: 1 / span 2;     /* span both rows */
+  justify-self: end;         /* align to the right */
+  font-size: 18px;           /* keep your current size or bump up */
   font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 2px;
+  color: black
 }
 
 .fact-desc {
   font-size: 11px;
-  color: #9ca3af;
+  color: #000;
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.facts-grid .fact-card,
+.facts-grid .fact-item {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Expandable Sections */
@@ -1195,4 +1267,10 @@ export default {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .fact-content { grid-template-columns: 1fr; }
+  .fact-value   { grid-column: 1; grid-row: 3; justify-self: start; }
+}
+
 </style>

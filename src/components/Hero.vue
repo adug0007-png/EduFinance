@@ -3,13 +3,12 @@
     <div class="container">
       <div class="hero-content-box">
         <div class="hero-content">
-          <h1 id="hero-title" class="hero-title">Know what it costs. <br>Know what to do.</h1>
+          <h1 id="hero-title" class="hero-title">Know your costs. <br>Budget, save, understand tax.</h1>
           <p class="hero-subtitle">
-            Learn the essentials and run the numbers—expenses, savings goals, tax and mortgage calculators—
-            so you can plan your study life with real figures and a plan you can actually follow.
+            Master the basics and crunch your costs—budget, save, and understand tax—so your budget is real, trackable, and doable.
           </p>
           <div class="hero-buttons">
-            <button class="btn btn-primary" @click="navigateTo('financial-literacy')">
+            <button class="btn btn-primary" @click="navigateTo('tax-learn')">
               Explore Financial Concepts
             </button>
           </div>

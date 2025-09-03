@@ -47,15 +47,15 @@ const headers = {
   },
   'financial-literacy': {
     title: 'Financial Literacy Hub',
-    subtitle: 'Learn practical money skills with interactive modules designed to boost your confidence and financial knowledge.',
+    subtitle: 'Learn practical money skills with curated videos on budgeting, saving, and tax.',
   },
   'cost-estimator': {
     title: 'Education Cost Estimator',
     subtitle: 'Get clear insights into tuition, living, and study costs tailored to your goals.',
   },
   'tax-learn': {
-    title: 'Learn Tax & Super',
-    subtitle: 'Understand Australian taxation and superannuation with interactive flashcards and calculators.',
+    title: 'Tax & Super',
+    subtitle: 'Understand Australian taxation and superannuation with with flashcards of key terms and a take-home pay calculator.',
   },
 }
 const activeHeader = computed(() => headers[currentRoute.value] || null)
