@@ -54,7 +54,7 @@ const headers = {
     subtitle: 'Get clear insights into tuition, living, and study costs tailored to your goals.',
   },
   'tax-learn': {
-    title: 'Tax & Super',
+    title: 'Financial Concepts',
     subtitle: 'Understand Australian taxation and superannuation with with flashcards of key terms and a take-home pay calculator.',
   },
 }
