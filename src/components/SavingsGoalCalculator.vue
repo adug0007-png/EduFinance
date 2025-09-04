@@ -6,9 +6,9 @@
       <div class="form-section">
         <div class="form-group">
           <label>Savings Goal</label>
-          <input 
-            type="text" 
-            v-model="savingsGoal" 
+          <input
+            type="text"
+            v-model="savingsGoal"
             placeholder="Enter your target amount"
             class="form-input"
           />
@@ -17,9 +17,9 @@
         <div class="form-row">
           <div class="form-group timeline-group">
             <label>Timeline</label>
-            <input 
-              type="text" 
-              v-model="timeline" 
+            <input
+              type="text"
+              v-model="timeline"
               placeholder="Duration"
               class="form-input timeline-input"
             />
@@ -35,9 +35,9 @@
 
         <div class="form-group">
           <label>Initial Deposit (Optional)</label>
-          <input 
-            type="text" 
-            v-model="initialDeposit" 
+          <input
+            type="text"
+            v-model="initialDeposit"
             placeholder="Amount you already have saved"
             class="form-input"
           />
@@ -45,22 +45,27 @@
 
         <div class="form-group">
           <label>Interest Rate (Annual %)</label>
-          <input 
-            type="text" 
-            v-model="interestRate" 
+          <input
+            type="text"
+            v-model="interestRate"
             placeholder="Expected annual interest rate"
             class="form-input"
           />
         </div>
 
         <button
-              type="button"
-              class="calculate-btn"
-              @click="calculateSavings"
-            >
-              Calculate Savings Plan
-            </button>
-
+          type="button"
+          class="calculate-btn"
+          @click="calculateSavings"
+        >
+          Calculate Savings Plan
+        </button>
+        <!-- Status messages (sits under the button) -->
+<div class="status-wrap" aria-live="polite">
+  <p v-if="statusMessage" class="status-msg" :class="statusClass">
+    {{ statusMessage }}
+  </p>
+</div>
 
       </div>
 
@@ -107,9 +112,14 @@ export default {
       timeUnit: 'months',
       initialDeposit: '1,000',
       interestRate: '3.5',
-      monthlyAmount: '0',
-      weeklyAmount: '0',
-      chart: null
+      // keep numeric
+      monthlyAmount: 0,
+      weeklyAmount: 0,
+      chart: null,
+
+      // NEW: status UI
+      statusMessage: '',
+      statusType: '' // '', 'info', 'success', 'warn', 'error'
     }
   },
   computed: {
@@ -124,179 +134,181 @@ export default {
     },
     amountToSave() {
       return Math.max(0, this.savingsGoalNum - this.initialDepositNum)
+    },
+    // NEW: class for message badge
+    statusClass() {
+      return this.statusType ? `is-${this.statusType}` : ''
     }
   },
-  mounted() {
-    // Remove auto-calculation on mount
-  },
   methods: {
+    // NEW: helper to set/clear status
+    setStatus(type = '', msg = '') {
+      this.statusType = type
+      this.statusMessage = msg
+    },
+
+    // stability patch (guards, clamping, weeks handling, ceil) + messages
     calculateSavings() {
-      const goal = this.savingsGoalNum
-      const initial = this.initialDepositNum
-      const rate = parseFloat(this.interestRate) || 0
-      const duration = this.timelineNum
-      
-      let months = duration
+      // clear any previous message
+      this.setStatus('', '')
+
+      const goal = Math.max(0, this.savingsGoalNum)
+      const initial = Math.max(0, this.initialDepositNum)
+      const ratePct = Math.max(0, parseFloat(this.interestRate) || 0)
+      const duration = Math.max(0, this.timelineNum)
+
+      // normalise periods
+      let months
+      let weeks
       if (this.timeUnit === 'weeks') {
-        months = duration / 4.33
+        weeks = duration
+        months = duration / 4.333 // months only for interest math
       } else if (this.timeUnit === 'years') {
         months = duration * 12
-      }
-      
-      const monthlyRate = rate / 100 / 12
-      const amountNeeded = goal - initial
-      
-      if (rate > 0) {
-        // With interest calculation
-        const futureValueOfInitial = initial * Math.pow(1 + monthlyRate, months)
-        const remainingAmount = goal - futureValueOfInitial
-        this.monthlyAmount = Math.round(remainingAmount / (((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate))).toString()
+        weeks = months * 4.333
       } else {
-        // Without interest
-        this.monthlyAmount = Math.round(amountNeeded / months).toString()
+        months = duration // months
+        weeks = months * 4.333
       }
-      
-      this.weeklyAmount = Math.round(parseFloat(this.monthlyAmount) / 4.33).toString()
-      
+
+      // invalid / zero-duration -> fail safe
+      if (!isFinite(months) || months <= 0) {
+        this.monthlyAmount = 0
+        this.weeklyAmount = 0
+        this.setStatus('error', 'Please enter a timeline greater than 0.')
+        return
+      }
+
+      const mRate = (ratePct / 100) / 12
+
+      // growth of initial alone
+      const fvInitial = mRate > 0 ? initial * Math.pow(1 + mRate, months) : initial
+      if (fvInitial >= goal) {
+        this.monthlyAmount = 0
+        this.weeklyAmount = 0
+        this.setStatus('success', 'Great news — your current savings already meet this goal. No monthly contributions needed.')
+        return
+      }
+
+      // required payments
+      const remaining = Math.max(0, goal - fvInitial)
+      let monthly
+
+      if (mRate > 0) {
+        // ordinary annuity (end of month)
+        const factor = (Math.pow(1 + mRate, months) - 1) / mRate
+        monthly = Math.ceil(remaining / factor)
+      } else {
+        monthly = Math.ceil((goal - initial) / months)
+      }
+
+      // weekly: compute directly if user selected weeks; else derive from monthly
+      const weekly =
+        this.timeUnit === 'weeks'
+          ? Math.ceil((goal - initial) / Math.max(1, weeks))
+          : Math.ceil(monthly / 4.333)
+
+      this.monthlyAmount = monthly
+      this.weeklyAmount = weekly
+
+      // context notes
+      const notes = []
+      if (this.timeUnit === 'weeks') notes.push('Using weeks; weekly amount is computed directly.')
+      if (mRate === 0) notes.push('Interest rate is 0%, plan assumes no growth.')
+      if (months < 2) notes.push('Very short timeline — monthly amount may be high.')
+
+      if (notes.length) {
+        const hasWarn = months < 2
+        this.setStatus(hasWarn ? 'warn' : 'info', notes.join(' '))
+      }
+
       this.$nextTick(() => {
-        this.initChart()
+        this.initChart(months, monthly, initial, mRate, goal)
       })
     },
-    
-    initChart() {
+
+    // dynamic, safe chart that follows the plan (interest + contributions)
+    initChart(months, monthly, initial, mRate, goal) {
       if (this.chart) {
         this.chart.dispose()
+        this.chart = null
       }
-      
-      const chartDom = this.$refs.chartCanvas
-      if (!chartDom) return
-      
-      this.chart = echarts.init(chartDom)
-      
-      // 固定显示12个月的数据，与设计图一致
+
+      const el = this.$refs.chartCanvas
+      if (!el) return
+
+      const steps = Math.min(Math.max(Math.round(months), 1), 60) // cap for readability
+      const categories = Array.from({ length: steps + 1 }, (_, i) => i)
       const data = []
-      const categories = []
-      let accumulated = this.initialDepositNum
-      
-      for (let i = 0; i <= 12; i++) {
-        categories.push(i)
-        data.push(accumulated)
-        if (i < 12) {
-          accumulated += parseFloat(this.monthlyAmount) || 750
-        }
+
+      let bal = initial
+      data.push(bal)
+      for (let i = 0; i < steps; i++) {
+        // end-of-period contribution, then interest
+        bal = (bal + monthly) * (1 + mRate)
+        data.push(bal)
       }
-      
-      const option = {
-        grid: {
-          left: '8%',
-          right: '8%',
-          bottom: '15%',
-          top: '8%'
-        },
+
+      const yMaxRaw = Math.max(goal, ...data)
+      const yMax = Math.ceil((yMaxRaw * 1.1) / 1000) * 1000
+      const interval = Math.max(1000, Math.ceil(yMax / 6 / 1000) * 1000)
+
+      const chart = echarts.init(el)
+      chart.setOption({
+        grid: { left: '8%', right: '8%', bottom: '15%', top: '8%' },
         xAxis: {
           type: 'category',
           data: categories,
           name: 'Months',
           nameLocation: 'middle',
           nameGap: 20,
-          nameTextStyle: {
-            color: '#666',
-            fontSize: 12
-          },
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: '#ddd'
-            }
-          },
-          axisTick: {
-            show: true,
-            lineStyle: {
-              color: '#ddd'
-            }
-          },
-          axisLabel: {
-            color: '#666',
-            fontSize: 11
-          }
+          nameTextStyle: { color: '#666', fontSize: 12 },
+          axisLine: { show: true, lineStyle: { color: '#ddd' } },
+          axisTick: { show: true, lineStyle: { color: '#ddd' } },
+          axisLabel: { color: '#666', fontSize: 11 }
         },
         yAxis: {
           type: 'value',
           name: 'Amount ($)',
           nameLocation: 'middle',
           nameGap: 35,
-          nameTextStyle: {
-            color: '#666',
-            fontSize: 12
-          },
           min: 0,
-          max: 12000,
-          interval: 2000,
-          axisLine: {
-            show: true,
-            lineStyle: {
-              color: '#ddd'
-            }
-          },
-          axisTick: {
-            show: true,
-            lineStyle: {
-              color: '#ddd'
-            }
-          },
-          axisLabel: {
-            color: '#666',
-            fontSize: 11,
-            formatter: '{value}'
-          },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: '#f0f0f0',
-              type: 'solid'
-            }
-          }
+          max: yMax,
+          interval,
+          axisLine: { show: true, lineStyle: { color: '#ddd' } },
+          axisTick: { show: true, lineStyle: { color: '#ddd' } },
+          axisLabel: { color: '#666', fontSize: 11, formatter: '{value}' },
+          splitLine: { show: true, lineStyle: { color: '#f0f0f0', type: 'solid' } }
         },
         series: [{
-          data: data,
+          data,
           type: 'line',
           smooth: true,
-          lineStyle: {
-            color: '#28a745',
-            width: 2
-          },
-          itemStyle: {
-            color: '#28a745',
-            borderWidth: 0
-          },
+          lineStyle: { color: '#28a745', width: 2 },
+          itemStyle: { color: '#28a745', borderWidth: 0 },
           symbol: 'circle',
           symbolSize: 3,
           showSymbol: true,
           areaStyle: {
             color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [{
-                offset: 0, color: 'rgba(40, 167, 69, 0.15)'
-              }, {
-                offset: 1, color: 'rgba(40, 167, 69, 0.02)'
-              }]
+              type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(40, 167, 69, 0.15)' },
+                { offset: 1, color: 'rgba(40, 167, 69, 0.02)' }
+              ]
             }
           }
         }]
-      }
-      
-      this.chart.setOption(option)
+      })
+
+      this.chart = chart
     },
-    
+
     formatNumber(num) {
       return new Intl.NumberFormat().format(num || 0)
     }
   },
-  
+
   beforeUnmount() {
     if (this.chart) {
       this.chart.dispose()
@@ -304,6 +316,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
   .savings-goal-calculator {
@@ -337,7 +350,7 @@ export default {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 40px;
-    align-items: stretch;
+    align-items: stretch; /* CHANGED: equal height columns */
   }
 
   .form-section {
@@ -433,19 +446,17 @@ export default {
     font-weight: 600;
     letter-spacing: .2px;
     transition: background-color .2s, box-shadow .2s;
-}
+  }
 
-.calculate-btn:hover {
+  .calculate-btn:hover {
     background: #4338CA;
     color: #fff;
-}
+  }
 
-.calculate-btn:focus-visible {
+  .calculate-btn:focus-visible {
     outline: 3px solid rgba(79, 70, 229, .35);
     outline-offset: 2px;
-}
-
-
+  }
 
   .results-section {
     display: flex;
@@ -596,4 +607,41 @@ export default {
       grid-template-columns: 1fr;
     }
   }
+
+  .status-wrap {
+  min-height: 18px;          /* keeps space even when empty */
+  margin-top: 10px;
+}
+
+.status-msg {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.3;
+  border: 1px solid transparent;
+}
+
+/* Variants */
+.is-info {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+}
+.is-success {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+.is-warn {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.is-error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
 </style>
