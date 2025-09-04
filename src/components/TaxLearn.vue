@@ -9,7 +9,7 @@
             <h2 class="card-title">Salary Calculator</h2>
             <button class="refresh-btn"></button>
           </div>
-          <p class="card-subtitle">Click the to see your take-home pay</p>
+          <p class="card-subtitle">Click the button to see your take-home pay</p>
 
           <div class="form-group">
             <label class="form-label">Annual Gross Salary</label>
