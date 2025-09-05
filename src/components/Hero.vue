@@ -3,9 +3,9 @@
     <div class="container">
       <div class="hero-content-box">
         <div class="hero-content">
-          <h1 id="hero-title" class="hero-title">Know your costs. <br>Budget, save, understand tax.</h1>
+          <h1 id="hero-title" class="hero-title">Know your costs <br>Budget, save, understand tax</h1>
           <p class="hero-subtitle">
-            Master the basics and crunch your costs—budget, save, and understand tax—so your budget is real, trackable, and doable.
+            Master the basics and crunch your costs—budget, save, and understand tax—so your budget is real, trackable, and doable
           </p>
           <div class="hero-buttons">
             <button class="btn btn-primary" @click="navigateTo('tax-learn')">
